@@ -9,6 +9,10 @@ class JpegWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
     public function setQuality($quality)
     {
         $this->_quality = (int) $quality;
+        if($this->_quality < 0 || $this->_quality >= 100) {
+            throw new \Exception('Quality of JPEG must be between 0 and 100.');
+        }
+        
         return $this;
     }
     

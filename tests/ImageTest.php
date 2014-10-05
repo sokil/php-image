@@ -23,7 +23,51 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $image = new Image('/some-unexisted-file.jpg');
     }
     
-    public function testWrite()
+    public function testWrite_Jpeg()
+    {
+        $sourceFilename = __DIR__ . '/test.jpg';
+        $targetFilename = sys_get_temp_dir() . '/sokil-php-image.jpg';
+        
+        $image = new Image($sourceFilename);
+        $image
+            ->write('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $writeStrategy) use($targetFilename) {                
+                $writeStrategy
+                    ->setQuality(100)
+                    ->toFile($targetFilename);
+            });
+            
+        // check file existance
+        $this->assertFileExists($targetFilename);
+        
+        // check image
+        $this->assertEquals(
+            getimagesize($sourceFilename), 
+            getimagesize($targetFilename)
+        );
+    }
+    
+    public function testWrite_Gif()
+    {
+        $sourceFilename = __DIR__ . '/test.gif';
+        $targetFilename = sys_get_temp_dir() . '/sokil-php-image.gif';
+        
+        $image = new Image($sourceFilename);
+        $image
+            ->write('gif', function(\Sokil\Image\WriteStrategy\GifWriteStrategy $writeStrategy) use($targetFilename) {                
+                $writeStrategy->toFile($targetFilename);
+            });
+            
+        // check file existance
+        $this->assertFileExists($targetFilename);
+        
+        // check image
+        $this->assertEquals(
+            getimagesize($sourceFilename), 
+            getimagesize($targetFilename)
+        );
+    }
+    
+    public function testWrite_Png()
     {
         $sourceFilename = __DIR__ . '/test.png';
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.png';
@@ -32,7 +76,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $image
             ->write('png', function(\Sokil\Image\WriteStrategy\PngWriteStrategy $writeStrategy) use($targetFilename) {                
                 $writeStrategy
-                    ->setQuality(100)
+                    ->setQuality(9)
                     ->toFile($targetFilename);
             });
             
