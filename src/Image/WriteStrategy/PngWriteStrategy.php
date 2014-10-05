@@ -73,6 +73,6 @@ class PngWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
     
     public function toStdout()
     {
-        imagepng($this->_resource, null);
+        imagepng($this->_resource, null, $this->_quality, $this->_filter);
     }
 }

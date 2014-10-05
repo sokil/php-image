@@ -17,6 +17,6 @@ class GifWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
     
     public function toStdout()
     {
-        imagegif($this->_resource, null);
+        imagegif($this->_resource);
     }
 }
