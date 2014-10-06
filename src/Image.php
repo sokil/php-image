@@ -110,7 +110,7 @@ class Image
         // save strategy
         foreach(self::$_resizeStrategyNamespaces as $namespace) {
             $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($mode)) . 'ResizeStrategy';
-            if(class_exists($resizeStrategyClassName)) {
+            if(!class_exists($resizeStrategyClassName)) {
                 continue;
             }
         }
