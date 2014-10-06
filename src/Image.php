@@ -121,6 +121,9 @@ class Image
         
         /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
         $resizeStrategy = new $resizeStrategyClassName();
+        if(!($resizeStrategy instanceof AbstractResizeStrategy)) {
+            throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
+        }
         
         return new self($resizeStrategy->resize($this->_resource, $width, $height));
     }
@@ -143,9 +146,14 @@ class Image
             throw new \Exception('Format ' . $format . ' not supported');
         }
         
+        $writeStrategy = new $writeStrategyClassName($this->_resource);
+        if(!($writeStrategy instanceof AbstractWriteStrategy)) {
+            throw new \Exception('Write strategy must extend AbstractWriteStrategy');
+        }
+        
         return call_user_func(
             $configuratorCallable, 
-            new $writeStrategyClassName($this->_resource)
+            
         );
     }
 }
