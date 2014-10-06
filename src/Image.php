@@ -34,12 +34,12 @@ class Image
     
     public static function addWriteStrategyNamespace($namespace)
     {
-        self::$_writeStrategyNamespaces[] = $namespace;
+        self::$_writeStrategyNamespaces[] = rtrim($namespace, '\\');
     }
     
     public static function addResizeStrategyNamespace($namespace) 
     {
-        self::$_resizeStrategyNamespaces[] = $namespace;
+        self::$_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
     }
     
     public function loadFile($filename)
