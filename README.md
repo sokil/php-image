@@ -51,6 +51,12 @@ There is four resize modes: 'scale', 'fit', 'crop' and 'cache'.
 $newImage = $image->resize($mode, $width, $height);
 ```
 
+If you want to register own resize strategy, extend class from \Sokil\Image\AbstractResizeStrategy and add namespase:
+```php
+\Sokil\Image::addWriteStrategyNamespace('\Vendor\ResizeStrategy')
+```
+
+
 Save image
 ----------
 
@@ -68,4 +74,9 @@ To send image to STDOUT you must define format of image and configure write stra
 $image->write('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $strategy) {
     $strategy->setQuality(98)->toStdout();
 });
+```
+
+If you want to register own write strategy to support new image format, extend class from \Sokil\Image\AbstractWriteStrategy and add namespase:
+```php
+\Sokil\Image::addWriteStrategyNamespace('\Vendor\WriteStrategy')
 ```
