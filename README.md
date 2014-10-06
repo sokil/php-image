@@ -55,6 +55,7 @@ If you want to register own resize strategy, extend class from \Sokil\Image\Abst
 ```php
 \Sokil\Image::addWriteStrategyNamespace('\Vendor\ResizeStrategy')
 ```
+Classes searches in priority of adding.
 
 
 Save image
@@ -80,3 +81,4 @@ If you want to register own write strategy to support new image format, extend c
 ```php
 \Sokil\Image::addWriteStrategyNamespace('\Vendor\WriteStrategy')
 ```
+Classes searches in priority of adding.
