@@ -156,4 +156,14 @@ class Image
             
         );
     }
+    
+    public function rotate($degree)
+    {
+        throw new \BadMethodCallException('Not implemented');
+    }
+    
+    public function greyscale($degree)
+    {
+        throw new \BadMethodCallException('Not implemented');
+    }
 }
