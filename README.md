@@ -4,6 +4,9 @@ php-image
 * [Installation](#installation)
 * [Open image](#open-image)
 * [Resize image](#resize-image)
+* [Rotate image](#rotate-image)
+* [Flip image](#flip-image)
+* [Greyscale image](#greyscale-image)
 * [Save image](#save-image)
 
 Installation
@@ -69,7 +72,7 @@ $newImage = $image->rotate(90);
 
 Rotate on 45 degrees, and fill empty field with black color:
 ```php
-$newImage = $image->rotate(90, '#000000');
+$newImage = $image->rotate(45, '#000000');
 ```
 
 Rotate on 45 degrees, and fill empty field with transparent green color:
