@@ -195,6 +195,18 @@ class Image
             $intColor & 0xFF,
         ];
     }
+    
+    /**
+     * Get Y from RGB in YIQ color model
+     * @link https://en.wikipedia.org/wiki/YIQ
+     * 
+     * @param array $rgb array [red, green, blue]
+     * @return int Y
+     */
+    public static function yiqGetYFromRgb(array $rgb)
+    {
+        return floor(($rgb[0] * 0.299) + ($rgb[1] * 0.587) + ($rgb[2] * 0.114));
+    }
 
     /**
      * 
@@ -332,25 +344,21 @@ class Image
             $this->_height
         );
 
+        // prepare greyscale palette
         for ($c = 0; $c < 256; $c++) {
             $palette[$c] = imagecolorallocate($greyscaleImageResource, $c, $c, $c);
         }
 
+        // set pixels
         for ($y = 0; $y < $this->_height; $y++) {
             for ($x = 0; $x < $this->_width; $x++) {
                 $rgb = imagecolorat($this->_resource, $x, $y);
-                list($r, $g, $b) = self::getRgbFromInt($rgb);
-                $grey = $this->yiq($r, $g, $b);
+                $grey = self::yiqGetYFromRgb(self::getRgbFromInt($rgb));
                 imagesetpixel($greyscaleImageResource, $x, $y, $palette[$grey]);
             }
         }
 
         return new self($greyscaleImageResource);
-    }
-
-    private function yiq($r, $g, $b)
-    {
-        return floor(($r * 0.299) + ($g * 0.587) + ($b * 0.114));
     }
 
 }
