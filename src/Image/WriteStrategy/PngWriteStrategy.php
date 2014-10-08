@@ -4,7 +4,7 @@ namespace Sokil\Image\WriteStrategy;
 
 class PngWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
 {
-    private $_quality = 100;
+    private $_quality = 9;
     
     private $_filter = PNG_NO_FILTER;
     
