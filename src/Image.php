@@ -241,31 +241,88 @@ class Image
     public function flipVertical()
     {
         // use native function
-        if(version_compare($this->_version, '5.5', '>=')) {
+        if(version_compare(PHP_VERSION, '5.5', '>=')) {
             return new self(imageflip($this->_resource, IMG_FLIP_VERTICAL));
         }
 
-        // implement vertical flipping
+        return $this->_flipVertical();
+    }
+    
+    private function _flipVertical()
+    {
+        $flippedImageResource = imagecreatetruecolor($this->_width, $this->_height);
+        
+        for($x = 0; $x < $this->_width; $x++) {
+            for($y = 0; $y < $this->_height; $y++) {
+                $color = imagecolorat($this->_resource, $x, $y);
+                imagesetpixel(
+                    $flippedImageResource, 
+                    $x, 
+                    $this->_height - 1 - $y, 
+                    $color
+                );
+            }
+        }
+        
+        return new self($flippedImageResource);
     }
 
     public function flipHorizontal()
     {
         // use native function
-        if(version_compare($this->_version, '5.5', '>=')) {
+        if(version_compare(PHP_VERSION, '5.5', '>=')) {
             return new self(imageflip($this->_resource, IMG_FLIP_HORIZONTAL));
         }
 
-        // implement vertical flipping
+        return $this->_flipHorizontal();
+    }
+    
+    private function _flipHorizontal()
+    {
+        $flippedImageResource = imagecreatetruecolor($this->_width, $this->_height);
+        
+        for($x = 0; $x < $this->_width; $x++) {
+            for($y = 0; $y < $this->_height; $y++) {
+                $color = imagecolorat($this->_resource, $x, $y);
+                imagesetpixel(
+                    $flippedImageResource, 
+                    $this->_width - 1 - $x, 
+                    $y, 
+                    $color
+                );
+            }
+        }
+        
+        return new self($flippedImageResource);
     }
 
     public function flipBoth()
     {
         // use native function
-        if(version_compare($this->_version, '5.5', '>=')) {
+        if(version_compare(PHP_VERSION, '5.5', '>=')) {
             return new self(imageflip($this->_resource, IMG_FLIP_BOTH));
         }
 
-        // implement vertical flipping
+        return $this->_flipBoth();
+    }
+    
+    private function _flipBoth()
+    {
+        $flippedImageResource = imagecreatetruecolor($this->_width, $this->_height);
+        
+        for($x = 0; $x < $this->_width; $x++) {
+            for($y = 0; $y < $this->_height; $y++) {
+                $color = imagecolorat($this->_resource, $x, $y);
+                imagesetpixel(
+                    $flippedImageResource, 
+                    $this->_width - 1 - $x, 
+                    $this->_height - 1 - $y, 
+                    $color
+                );
+            }
+        }
+        
+        return new self($flippedImageResource);
     }
 
     public function greyscale()

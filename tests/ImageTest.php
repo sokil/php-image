@@ -125,6 +125,61 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(300, $resizedImage->getHeight());
     }
     
+    public function testFlipVertical()
+    {
+        $image = new Image(__DIR__ . '/test.png');
+        
+        $reflection = new \ReflectionClass($image);
+        $method = $reflection->getMethod('_flipVertical');
+        $method->setAccessible(true);
+        
+        $flippedImage = $method->invoke($image);
+        
+        $this->assertEquals(
+            imagecolorat($image->getResource(), 50, 50),
+            imagecolorat($flippedImage->getResource(), 50, 150)
+        );
+    }
+    
+    public function testFlipHorizontal()
+    {
+        $image = new Image(__DIR__ . '/test.png');
+        
+        $reflection = new \ReflectionClass($image);
+        $method = $reflection->getMethod('_flipHorizontal');
+        $method->setAccessible(true);
+        
+        $flippedImage = $method->invoke($image);
+        
+        $this->assertEquals(
+            imagecolorat($image->getResource(), 50, 100),
+            imagecolorat($flippedImage->getResource(), 250, 100)
+        );
+    }
+    
+    public function testFlipBoth()
+    {
+        $image = new Image(__DIR__ . '/test.png');
+        
+        $reflection = new \ReflectionClass($image);
+        $method = $reflection->getMethod('_flipBoth');
+        $method->setAccessible(true);
+        
+        $flippedImage = $method->invoke($image);
+        
+        // vertical
+        $this->assertEquals(
+            imagecolorat($image->getResource(), 50, 50),
+            imagecolorat($flippedImage->getResource(), 50, 150)
+        );
+        
+        // horizontal
+        $this->assertEquals(
+            imagecolorat($image->getResource(), 50, 100),
+            imagecolorat($flippedImage->getResource(), 250, 100)
+        );
+    }
+    
     public function testGreyscale()
     {
         $image = new Image(__DIR__ . '/test.png');
