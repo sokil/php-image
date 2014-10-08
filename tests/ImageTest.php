@@ -98,4 +98,30 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(100, $resizedImage->getWidth());
         $this->assertEquals(66, $resizedImage->getHeight());
     }
+    
+    public function testGetRgbFromHex()
+    {
+        $image = new Image();
+        
+        $imageReflection = new \ReflectionClass($image);
+        $method = $imageReflection->getMethod('getRgbFromHex');
+        $method->setAccessible(true);
+        
+        $this->assertEquals([239, 239, 239, 0], $method->invoke($image, '#efefef'));
+        
+        $this->assertEquals([239, 239, 239, 0], $method->invoke($image, 'efefef'));
+        
+        $this->assertEquals([239, 239, 239, 64], $method->invoke($image, '#80efefef'));
+        
+        $this->assertEquals([239, 239, 239, 64], $method->invoke($image, '80efefef'));
+    }
+    
+    public function testRotate()
+    {
+        $image = new Image(__DIR__ . '/test.png');
+        $resizedImage = $image->rotate(90, '#FF0000');
+        
+        $this->assertEquals(200, $resizedImage->getWidth());
+        $this->assertEquals(300, $resizedImage->getHeight());
+    }
 }

@@ -157,9 +157,81 @@ class Image
         );
     }
     
-    public function rotate($degree)
+    /**
+     * Get [R, G, B, Alpha] from '#ARGB'
+     * @param string $hexString
+     */
+    protected function getRgbFromHex($hexString)
     {
-        throw new \BadMethodCallException('Not implemented');
+        $hexArray = str_split(ltrim($hexString, '#'), 2);
+        $decimalArray = array_map('hexdec', $hexArray);
+        
+        $chunksNum = count($decimalArray);
+        if($chunksNum < 3 || $chunksNum > 4) {
+            throw new \InvalidArgumentException('Wrong hex color specified');
+        }
+        
+        // no alpha passed
+        if(3 == $chunksNum) {
+            $decimalArray[] = 0;
+        } else {
+            $alpha = floor(array_shift($decimalArray) / 2);
+            $decimalArray[] = $alpha;
+        }
+        
+        return $decimalArray;
+    }
+    
+    /**
+     * 
+     * @param type $angle
+     * @param array $backgroundColor
+     */
+    public function rotate($angle, $backgroundColor = null)
+    {
+        // convert color to compartible format
+        if(!$backgroundColor) {
+            $backgroundColor = [0, 0, 0, 127];
+        } elseif(is_string($backgroundColor)) {
+            $backgroundColor = $this->getRgbFromHex($backgroundColor);
+        } elseif(is_array($backgroundColor)) {
+            if(count($backgroundColor) < 3 || count($backgroundColor) > 4) {
+                throw new \InvalidArgumentException('Wrong color specified');
+            }
+            // check is alpha specified
+            if(!isset($backgroundColor[4])) {
+                $backgroundColor[4] = 127;
+            }
+        } else {
+            throw new \InvalidArgumentException('Wrong color specified');
+        }
+
+        // create color
+        $backgroundColorId = imageColorAllocateAlpha(
+            $this->_resource,
+            $backgroundColor[0],
+            $backgroundColor[1],
+            $backgroundColor[2],
+            $backgroundColor[3]
+        );
+        
+        // rotate image
+        $rotatedImageResource = imagerotate($this->_resource, $angle, $backgroundColorId, true);
+        
+        imagealphablending($rotatedImageResource, false);
+        imagesavealpha($rotatedImageResource, true);
+        
+        return new self($rotatedImageResource);
+    }
+    
+    public function flipVertical()
+    {
+        
+    }
+    
+    public function flipHorizontal()
+    {
+        
     }
     
     public function greyscale($degree)
