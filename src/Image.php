@@ -153,7 +153,7 @@ class Image
         
         return call_user_func(
             $configuratorCallable, 
-            new $writeStrategyClassName($this->_resource)
+            $writeStrategy
         );
     }
     
