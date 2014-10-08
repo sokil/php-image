@@ -62,6 +62,15 @@ class Rgb
         );
     }
     
+    public static function fromIntAsArray($intColor)
+    {
+        return [
+            ($intColor >> 16) & 0xFF,
+            ($intColor >> 8) & 0xFF,
+            $intColor & 0xFF,
+        ];
+    }
+    
     public function getRed()
     {
         return $this->red;

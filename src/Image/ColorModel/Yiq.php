@@ -34,6 +34,17 @@ class Yiq
     }
     
     /**
+     * Get Y from RGB in YIQ color model
+     * 
+     * @param \Sokil\Image\ColorModel\Rgb $rgb 
+     * @return int Y
+     */
+    public static function getYFromRgbArray(array $rgb)
+    {
+        return floor(($rgb[0] * 0.299) + ($rgb[1] * 0.587) + ($rgb[2] * 0.114));
+    }
+    
+    /**
      * Get I from RGB in YIQ color model
      * 
      * @param \Sokil\Image\ColorModel\Rgb $rgb

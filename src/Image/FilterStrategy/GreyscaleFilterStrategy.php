@@ -27,7 +27,7 @@ class GreyscaleFilterStrategy extends \Sokil\Image\AbstractFilterStrategy
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
                 $rgb = imagecolorat($this->_resource, $x, $y);
-                $grey = Yiq::getYFromRgb(Rgb::fromInt($rgb));
+                $grey = Yiq::getYFromRgbArray(Rgb::fromIntAsArray($rgb));
                 imagesetpixel($greyscaleImageResource, $x, $y, $palette[$grey]);
             }
         }

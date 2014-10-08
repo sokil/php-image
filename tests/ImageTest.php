@@ -171,9 +171,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $greyscaleImage = $image->filter('greyscale');
         
         $color = imagecolorat($greyscaleImage->getResource(), 0, 0);
-        $this->assertEquals([29, 29, 29, 0], Rgb::fromInt($color)->toArray());
+        $this->assertEquals([29, 29, 29], Rgb::fromIntAsArray($color));
         
         $color = imagecolorat($greyscaleImage->getResource(), 0, 199);
-        $this->assertEquals([225, 225, 225, 0], Rgb::fromInt($color)->toArray());
+        $this->assertEquals([225, 225, 225], Rgb::fromIntAsArray($color));
     }
 }
