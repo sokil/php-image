@@ -124,4 +124,16 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $resizedImage->getWidth());
         $this->assertEquals(300, $resizedImage->getHeight());
     }
+    
+    public function testGreyscale()
+    {
+        $image = new Image(__DIR__ . '/test.png');
+        $greyscaleImage = $image->greyscale();
+        
+        $color = imagecolorat($greyscaleImage->getResource(), 0, 0);
+        $this->assertEquals([29, 29, 29], Image::getRgbFromInt($color));
+        
+        $color = imagecolorat($greyscaleImage->getResource(), 0, 199);
+        $this->assertEquals([225, 225, 225], Image::getRgbFromInt($color));
+    }
 }

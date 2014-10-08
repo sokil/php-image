@@ -3,13 +3,13 @@
 namespace Sokil;
 
 class Image
-{    
+{
     private $_resource;
     
     private $_width;
     
     private $_height;
-    
+
     private static $_writeStrategyNamespaces = [
         '\Sokil\Image\WriteStrategy',
     ];
@@ -20,52 +20,53 @@ class Image
 
     public function __construct($image = null)
     {
+
         // load image
-        if($image) {
-            if(is_string($image)) {
+        if ($image) {
+            if (is_string($image)) {
                 $this->loadFile($image);
-            } elseif(is_resource($image)) {
+            } elseif (is_resource($image)) {
                 $this->loadResource($image);
             } else {
                 throw new \Exception('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
     }
-    
+
     public static function addWriteStrategyNamespace($namespace)
     {
         self::$_writeStrategyNamespaces[] = rtrim($namespace, '\\');
     }
-    
-    public static function addResizeStrategyNamespace($namespace) 
+
+    public static function addResizeStrategyNamespace($namespace)
     {
         self::$_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
     }
-    
+
     public function loadFile($filename)
     {
-        if(!file_exists($filename)) {
-            throw new \Exception('File '  . $filename . ' not found');
+        if (!file_exists($filename)) {
+            throw new \Exception('File ' . $filename . ' not found');
         }
-        
-        if(!is_readable($filename)) {
-            throw new \Exception('File '  . $filename . ' not readable');
+
+        if (!is_readable($filename)) {
+            throw new \Exception('File ' . $filename . ' not readable');
         }
-        
+
         $imageInfo = @getimagesize($filename);
-        if(!$imageInfo) {
+        if (!$imageInfo) {
             throw new \Exception('Wrong image format');
         }
 
-        if(!in_array($imageInfo[2], array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF))) {
+        if (!in_array($imageInfo[2], array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF))) {
             throw new \Exception('Only image of JPEG, PNG and GIF formats supported');
         }
-        
+
         $this->_width = $imageInfo[0];
-        
+
         $this->_height = $imageInfo[1];
-        
-        switch($imageInfo[2]) {
+
+        switch ($imageInfo[2]) {
             case IMAGETYPE_JPEG:
                 $this->_resource = @imagecreatefromjpeg($filename);
                 break;
@@ -76,112 +77,125 @@ class Image
                 $this->_resource = @imagecreatefromgif($filename);
                 break;
         }
-        
+
         return $this;
     }
-    
+
     public function loadResource($resource)
     {
-        if(!(is_resource($resource) && 'gd' === get_resource_type($resource))) {
+        if (!(is_resource($resource) && 'gd' === get_resource_type($resource))) {
             throw new \Exception('Must be resource of type "gd", ' . gettype($resource) . ' given');
         }
-        
+
         $this->_resource = $resource;
-        
+
         $this->_width = imagesx($resource);
-        
+
         $this->_height = imagesy($resource);
-        
+
         return $this;
     }
-    
+
+    public function getResource()
+    {
+        return $this->_resource;
+    }
+
     public function getWidth()
     {
         return $this->_width;
     }
-    
+
     public function getHeight()
     {
         return $this->_height;
     }
-    
-    public function resize($mode, $width, $height) 
+
+    public function resize($mode, $width, $height)
     {
         // save strategy
-        foreach(self::$_resizeStrategyNamespaces as $namespace) {
+        foreach (self::$_resizeStrategyNamespaces as $namespace) {
             $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($mode)) . 'ResizeStrategy';
-            if(!class_exists($resizeStrategyClassName)) {
+            if (!class_exists($resizeStrategyClassName)) {
                 continue;
             }
         }
-        
-        if(!$resizeStrategyClassName) {
+
+        if (!$resizeStrategyClassName) {
             throw new \Exception('Resize mode ' . $mode . ' not supported');
         }
-        
+
         /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
         $resizeStrategy = new $resizeStrategyClassName();
-        if(!($resizeStrategy instanceof \Sokil\Image\AbstractResizeStrategy)) {
+        if (!($resizeStrategy instanceof \Sokil\Image\AbstractResizeStrategy)) {
             throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
         }
-        
+
         return new self($resizeStrategy->resize($this->_resource, $width, $height));
     }
-    
+
     /**
      * @param string $format
      * @return \Sokil\Image\AbstractWriteStrategy
      */
     public function write($format, $configuratorCallable)
-    {        
+    {
         // save strategy
-        foreach(self::$_writeStrategyNamespaces as $namespace) {
+        foreach (self::$_writeStrategyNamespaces as $namespace) {
             $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
-            if(!class_exists($writeStrategyClassName)) {
+            if (!class_exists($writeStrategyClassName)) {
                 continue;
             }
         }
-        
-        if(!$writeStrategyClassName) {
+
+        if (!$writeStrategyClassName) {
             throw new \Exception('Format ' . $format . ' not supported');
         }
-        
+
         $writeStrategy = new $writeStrategyClassName($this->_resource);
-        if(!($writeStrategy instanceof \Sokil\Image\AbstractWriteStrategy)) {
+        if (!($writeStrategy instanceof \Sokil\Image\AbstractWriteStrategy)) {
             throw new \Exception('Write strategy must extend AbstractWriteStrategy');
         }
-        
+
         return call_user_func(
-            $configuratorCallable, 
-            $writeStrategy
+                $configuratorCallable, $writeStrategy
         );
     }
-    
+
     /**
      * Get [R, G, B, Alpha] from '#ARGB'
-     * @param string $hexString
+     * @param string $hexColor
      */
-    protected function getRgbFromHex($hexString)
+    public static function getRgbFromHex($hexColor)
     {
-        $hexArray = str_split(ltrim($hexString, '#'), 2);
+        $hexArray = str_split(ltrim($hexColor, '#'), 2);
         $decimalArray = array_map('hexdec', $hexArray);
-        
+
         $chunksNum = count($decimalArray);
-        if($chunksNum < 3 || $chunksNum > 4) {
+        if ($chunksNum < 3 || $chunksNum > 4) {
             throw new \InvalidArgumentException('Wrong hex color specified');
         }
-        
+
         // no alpha passed
-        if(3 == $chunksNum) {
+        if (3 == $chunksNum) {
             $decimalArray[] = 0;
         } else {
             $alpha = floor(array_shift($decimalArray) / 2);
             $decimalArray[] = $alpha;
         }
-        
+
         return $decimalArray;
     }
     
+    public static function getRgbFromInt($intColor)
+    {
+        return [
+            ($intColor >> 16) & 0xFF,
+            ($intColor >> 8) & 0xFF,
+            $intColor & 0xFF,
+        ];
+    }
+
     /**
      * 
      * @param type $angle
@@ -190,16 +204,16 @@ class Image
     public function rotate($angle, $backgroundColor = null)
     {
         // convert color to compartible format
-        if(!$backgroundColor) {
+        if (!$backgroundColor) {
             $backgroundColor = [0, 0, 0, 127];
-        } elseif(is_string($backgroundColor)) {
+        } elseif (is_string($backgroundColor)) {
             $backgroundColor = $this->getRgbFromHex($backgroundColor);
-        } elseif(is_array($backgroundColor)) {
-            if(count($backgroundColor) < 3 || count($backgroundColor) > 4) {
+        } elseif (is_array($backgroundColor)) {
+            if (count($backgroundColor) < 3 || count($backgroundColor) > 4) {
                 throw new \InvalidArgumentException('Wrong color specified');
             }
             // check is alpha specified
-            if(!isset($backgroundColor[4])) {
+            if (!isset($backgroundColor[4])) {
                 $backgroundColor[4] = 127;
             }
         } else {
@@ -208,34 +222,78 @@ class Image
 
         // create color
         $backgroundColorId = imageColorAllocateAlpha(
-            $this->_resource,
-            $backgroundColor[0],
-            $backgroundColor[1],
-            $backgroundColor[2],
+            $this->_resource, 
+            $backgroundColor[0], 
+            $backgroundColor[1], 
+            $backgroundColor[2], 
             $backgroundColor[3]
         );
-        
+
         // rotate image
         $rotatedImageResource = imagerotate($this->_resource, $angle, $backgroundColorId, true);
-        
+
         imagealphablending($rotatedImageResource, false);
         imagesavealpha($rotatedImageResource, true);
-        
+
         return new self($rotatedImageResource);
     }
-    
+
     public function flipVertical()
     {
-        
+        // use native function
+        if(version_compare($this->_version, '5.5', '>=')) {
+            return new self(imageflip($this->_resource, IMG_FLIP_VERTICAL));
+        }
+
+        // implement vertical flipping
     }
-    
+
     public function flipHorizontal()
     {
-        
+        // use native function
+        if(version_compare($this->_version, '5.5', '>=')) {
+            return new self(imageflip($this->_resource, IMG_FLIP_HORIZONTAL));
+        }
+
+        // implement vertical flipping
     }
-    
-    public function greyscale($degree)
+
+    public function flipBoth()
     {
-        throw new \BadMethodCallException('Not implemented');
+        // use native function
+        if(version_compare($this->_version, '5.5', '>=')) {
+            return new self(imageflip($this->_resource, IMG_FLIP_BOTH));
+        }
+
+        // implement vertical flipping
     }
+
+    public function greyscale()
+    {
+        $greyscaleImageResource = imagecreatetruecolor(
+            $this->_width, 
+            $this->_height
+        );
+
+        for ($c = 0; $c < 256; $c++) {
+            $palette[$c] = imagecolorallocate($greyscaleImageResource, $c, $c, $c);
+        }
+
+        for ($y = 0; $y < $this->_height; $y++) {
+            for ($x = 0; $x < $this->_width; $x++) {
+                $rgb = imagecolorat($this->_resource, $x, $y);
+                list($r, $g, $b) = self::getRgbFromInt($rgb);
+                $grey = $this->yiq($r, $g, $b);
+                imagesetpixel($greyscaleImageResource, $x, $y, $palette[$grey]);
+            }
+        }
+
+        return new self($greyscaleImageResource);
+    }
+
+    private function yiq($r, $g, $b)
+    {
+        return floor(($r * 0.299) + ($g * 0.587) + ($b * 0.114));
+    }
+
 }
