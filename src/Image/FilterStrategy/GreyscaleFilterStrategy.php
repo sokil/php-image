@@ -1,0 +1,37 @@
+<?php
+
+namespace Sokil\Image\FilterStrategy;
+
+use Sokil\Image\ColorModel\Rgb;
+use Sokil\Image\ColorModel\Yiq;
+
+class GreyscaleFilterStrategy extends \Sokil\Image\AbstractFilterStrategy
+{
+    public function filter()
+    {
+        $width = imagesx($this->_resource);
+        
+        $height = imagesy($this->_resource);
+        
+        $greyscaleImageResource = imagecreatetruecolor(
+            $width, 
+            $height
+        );
+
+        // prepare greyscale palette
+        for ($c = 0; $c < 256; $c++) {
+            $palette[$c] = imagecolorallocate($greyscaleImageResource, $c, $c, $c);
+        }
+
+        // set pixels
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                $rgb = imagecolorat($this->_resource, $x, $y);
+                $grey = Yiq::getYFromRgb(Rgb::fromInt($rgb));
+                imagesetpixel($greyscaleImageResource, $x, $y, $palette[$grey]);
+            }
+        }
+
+        return $greyscaleImageResource;
+    }
+}

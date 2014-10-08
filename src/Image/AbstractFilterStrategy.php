@@ -2,27 +2,21 @@
 
 namespace Sokil\Image;
 
-abstract class AbstractWriteStrategy
+abstract class AbstractFilterStrategy
 {
     protected $_resource;
     
-    protected $_targetPath;
-
     public function __construct($resource)
     {
-        $this->_resource = $resource;
         if(!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
             throw new \Exception('Resource must be given');
         }
+        
+        $this->_resource = $resource;
     }
-
-    /**
-     * Write resource to file
-     */
-    abstract public function toFile($targetPath);
     
     /**
-     * Write resource to STDOUT
+     * @return resource filtered gd resource
      */
-    abstract public function toStdout();
+    abstract public function filter();
 }

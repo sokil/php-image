@@ -2,6 +2,8 @@
 
 namespace Sokil;
 
+use \Sokil\Image\ColorModel\Rgb;
+
 class ImageTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -99,23 +101,6 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(66, $resizedImage->getHeight());
     }
     
-    public function testGetRgbFromHex()
-    {
-        $image = new Image();
-        
-        $imageReflection = new \ReflectionClass($image);
-        $method = $imageReflection->getMethod('getRgbFromHex');
-        $method->setAccessible(true);
-        
-        $this->assertEquals([239, 239, 239, 0], $method->invoke($image, '#efefef'));
-        
-        $this->assertEquals([239, 239, 239, 0], $method->invoke($image, 'efefef'));
-        
-        $this->assertEquals([239, 239, 239, 64], $method->invoke($image, '#80efefef'));
-        
-        $this->assertEquals([239, 239, 239, 64], $method->invoke($image, '80efefef'));
-    }
-    
     public function testRotate()
     {
         $image = new Image(__DIR__ . '/test.png');
@@ -183,12 +168,12 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testGreyscale()
     {
         $image = new Image(__DIR__ . '/test.png');
-        $greyscaleImage = $image->greyscale();
+        $greyscaleImage = $image->filter('greyscale');
         
         $color = imagecolorat($greyscaleImage->getResource(), 0, 0);
-        $this->assertEquals([29, 29, 29], Image::getRgbFromInt($color));
+        $this->assertEquals([29, 29, 29, 0], Rgb::fromInt($color)->toArray());
         
         $color = imagecolorat($greyscaleImage->getResource(), 0, 199);
-        $this->assertEquals([225, 225, 225], Image::getRgbFromInt($color));
+        $this->assertEquals([225, 225, 225, 0], Rgb::fromInt($color)->toArray());
     }
 }
