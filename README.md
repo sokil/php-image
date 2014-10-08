@@ -57,6 +57,50 @@ If you want to register own resize strategy, extend class from \Sokil\Image\Abst
 ```
 Classes searches in priority of adding.
 
+Rotate image
+------------
+
+Rotating is counter clockwise;
+
+Rotate on 90 degrees:
+```php
+$newImage = $image->rotate(90);
+```
+
+Rotate on 45 degrees, and fill empty field with black color:
+```php
+$newImage = $image->rotate(90, '#000000');
+```
+
+Rotate on 45 degrees, and fill empty field with transparent green color:
+```php
+$newImage = $image->rotate(45, '#8000FF00');
+```
+
+Flip image
+----------
+
+Flip in vertical direction:
+```php
+$newImage = $image->flipVertical();
+```
+
+Flip in horisontal direction
+```php
+$newImage = $image->flipHorisontal();
+```
+
+Flip in both directions
+```php
+$newImage = $image->flipBoth();
+```
+
+Greyscale image
+---------------
+
+```php
+$newImage = $image->greyscale();
+```
 
 Save image
 ----------
