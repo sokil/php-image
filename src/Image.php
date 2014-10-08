@@ -82,7 +82,7 @@ class Image
     
     public function loadResource($resource)
     {
-        if(!(is_resource($resource) && 'gd' === get_resource_type($resource)) {
+        if(!(is_resource($resource) && 'gd' === get_resource_type($resource))) {
             throw new \Exception('Must be resource of type "gd", ' . gettype($resource) . ' given');
         }
         
