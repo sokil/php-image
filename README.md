@@ -102,7 +102,7 @@ Greyscale image
 ---------------
 
 ```php
-$newImage = $image->greyscale();
+$newImage = $image->filter('greyscale');
 ```
 
 Save image
