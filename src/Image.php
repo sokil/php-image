@@ -121,7 +121,7 @@ class Image
         
         /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
         $resizeStrategy = new $resizeStrategyClassName();
-        if(!($resizeStrategy instanceof AbstractResizeStrategy)) {
+        if(!($resizeStrategy instanceof \Sokil\Image\AbstractResizeStrategy)) {
             throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
         }
         
@@ -147,13 +147,13 @@ class Image
         }
         
         $writeStrategy = new $writeStrategyClassName($this->_resource);
-        if(!($writeStrategy instanceof AbstractWriteStrategy)) {
+        if(!($writeStrategy instanceof \Sokil\Image\AbstractWriteStrategy)) {
             throw new \Exception('Write strategy must extend AbstractWriteStrategy');
         }
         
         return call_user_func(
             $configuratorCallable, 
-            
+            new $writeStrategyClassName($this->_resource)
         );
     }
     
