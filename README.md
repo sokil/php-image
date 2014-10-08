@@ -6,7 +6,7 @@ php-image
 * [Resize image](#resize-image)
 * [Rotate image](#rotate-image)
 * [Flip image](#flip-image)
-* [Greyscale image](#greyscale-image)
+* [Filters](#filters)
 * [Save image](#save-image)
 
 Installation
@@ -98,12 +98,19 @@ Flip in both directions
 $newImage = $image->flipBoth();
 ```
 
-Greyscale image
----------------
+Filters
+-------
 
+Greyscale image:
 ```php
 $newImage = $image->filter('greyscale');
 ```
+
+If you want to register own filter strategy to support new filters, extend class from \Sokil\Image\AbstractFilterStrategy and add namespase:
+```php
+\Sokil\Image::addFilterStrategyNamespace('\Vendor\FilterStrategy')
+```
+Classes searches in priority of adding.
 
 Save image
 ----------
