@@ -4,9 +4,9 @@ namespace Sokil;
 
 class ImageFactory
 {
-    private static $_elementNamespaces = [
+    private static $_elementNamespaces = array(
         '\Sokil\Image\Element',
-    ];
+    );
 
     public static function addElementNamespace($namespace)
     {

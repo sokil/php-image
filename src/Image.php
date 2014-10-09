@@ -13,17 +13,17 @@ class Image
     
     private $_height;
 
-    private static $_writeStrategyNamespaces = [
+    private static $_writeStrategyNamespaces = array(
         '\Sokil\Image\WriteStrategy',
-    ];
+    );
     
-    private static $_resizeStrategyNamespaces = [
+    private static $_resizeStrategyNamespaces = array(
         '\Sokil\Image\ResizeStrategy',
-    ];
+    );
     
-    private static $_filterStrategyNamespaces = [
+    private static $_filterStrategyNamespaces = array(
         '\Sokil\Image\FilterStrategy',
-    ];
+    );
 
     public function __construct($image = null)
     {
