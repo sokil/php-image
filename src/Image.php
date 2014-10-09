@@ -3,6 +3,7 @@
 namespace Sokil;
 
 use Sokil\Image\ColorModel\Rgb;
+use Sokil\Image\AbstractElement;
 
 class Image
 {
@@ -109,7 +110,27 @@ class Image
     
     public function create($width, $height)
     {
-        $this->loadResource(imagecreatetruecolor($width, $height));
+        return $this->loadResource(imagecreatetruecolor($width, $height));
+    }
+    
+    public function fill($color, $x = 0, $y = 0)
+    {
+        $color = Rgb::normalize($color);
+        
+        imagefill(
+            $this->_resource, 
+            $x, 
+            $y, 
+            imagecolorallocatealpha(
+                $this->_resource, 
+                $color->getRed(), 
+                $color->getGreen(), 
+                $color->getBlue(), 
+                $color->getAlpha()
+            )
+        );
+        
+        return $this;
     }
 
     public function getResource()
@@ -137,7 +158,7 @@ class Image
             }
         }
 
-        if (!$resizeStrategyClassName) {
+        if (!isset($resizeStrategyClassName)) {
             throw new \Exception('Resize mode ' . $mode . ' not supported');
         }
 
@@ -164,7 +185,7 @@ class Image
             }
         }
 
-        if (!$writeStrategyClassName) {
+        if (!isset($writeStrategyClassName)) {
             throw new \Exception('Format ' . $format . ' not supported');
         }
 
@@ -185,30 +206,17 @@ class Image
      */
     public function rotate($angle, $backgroundColor = null)
     {
-        // convert color to compartible format
-        if (!$backgroundColor) {
-            $backgroundColor = [0, 0, 0, 127];
-        } elseif (is_string($backgroundColor)) {
-            $backgroundColor = Rgb::fromHex($backgroundColor)->toArray();
-        } elseif (is_array($backgroundColor)) {
-            if (count($backgroundColor) < 3 || count($backgroundColor) > 4) {
-                throw new \InvalidArgumentException('Wrong color specified');
-            }
-            // check is alpha specified
-            if (!isset($backgroundColor[4])) {
-                $backgroundColor[4] = 127;
-            }
-        } else {
-            throw new \InvalidArgumentException('Wrong color specified');
-        }
+        $backgroundColor = $backgroundColor 
+            ? Rgb::normalize($backgroundColor)
+            : new Rgb(0, 0, 0, 127);
 
         // create color
         $backgroundColorId = imageColorAllocateAlpha(
             $this->_resource, 
-            $backgroundColor[0], 
-            $backgroundColor[1], 
-            $backgroundColor[2], 
-            $backgroundColor[3]
+            $backgroundColor->getRed(), 
+            $backgroundColor->getGreen(), 
+            $backgroundColor->getBlue(), 
+            $backgroundColor->getAlpha()
         );
 
         // rotate image
@@ -317,7 +325,7 @@ class Image
             }
         }
 
-        if (!$filterStrategyClassName) {
+        if (!isset($filterStrategyClassName)) {
             throw new \Exception('Filter ' . $name . ' not supported');
         }
 
@@ -332,5 +340,12 @@ class Image
         }
         
         return new self($filterStrategy->filter());
+    }
+    
+    public function appendElementAtPosition(AbstractElement $element, $x, $y)
+    {
+        $element->draw($this->_resource, $x, $y);
+        
+        return $this;
     }
 }

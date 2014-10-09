@@ -176,4 +176,31 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $color = imagecolorat($greyscaleImage->getResource(), 0, 199);
         $this->assertEquals([225, 225, 225], Rgb::fromIntAsArray($color));
     }
+    
+    public function testAppendElement_TextElement()
+    {
+        $factory = new ImageFactory();
+        
+        // text element
+        $element = $factory
+            ->createTextElement()
+            ->setText('hello world')
+            ->setAngle(20)
+            ->setSize(40)
+            ->setFont(__DIR__ . '/FreeSerif.ttf');
+        
+        // place text to image
+        $image = $factory
+            ->createImage(300, 300)
+            ->fill(Rgb::createWhite())
+            // draw shadow
+            ->appendElementAtPosition($element->setColor('#ababab'), 50, 150)
+            // draw text
+            ->appendElementAtPosition($element->setColor('#ff0000'), 49, 149);
+        
+        $intColor = imagecolorat($image->getResource(), 47, 126);
+        $color = Rgb::fromInt($intColor)->toArray();
+        
+        $this->assertEquals([255, 0, 0, 0], $color);
+    }
 }

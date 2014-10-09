@@ -23,6 +23,56 @@ class Rgb
         $this->alpha = $alpha;
     }
     
+    public static function createBlack()
+    {
+        return new self(0, 0, 0);
+    }
+    
+    public static function createWhite()
+    {
+        return new self(255, 255, 255);
+    }
+    
+    /**
+     * Get Rgb color from any source
+     * 
+     * @param int|string|array $color
+     * @return \sSokil\Image\ColorModel\Rgb
+     * @throws \InvalidArgumentException
+     */
+    public static function normalize($color)
+    {
+        // already Rgb
+        if($color instanceof self) {
+            return $color;
+        }
+        
+        // int
+        if(is_int($color)) {
+            return self::fromInt($color);
+        }
+        
+        // hex
+        if (is_string($color)) {
+            return self::fromHex($color);
+        } 
+        
+        // array
+        if (is_array($color)) {
+            if (count($color) < 3 || count($color) > 4) {
+                throw new \InvalidArgumentException('Wrong color specified');
+            }
+            // check is alpha specified
+            if (!isset($color[4])) {
+                $color[4] = 127;
+            }
+            
+            return new self($color[0], $color[1], $color[2], $color[3]);
+        }
+        
+        throw new \InvalidArgumentException('Wrong color specified');
+    }
+    
     /**
      * Get [R, G, B, Alpha] from '#ARGB'
      * @param string $hexColor
