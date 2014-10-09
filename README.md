@@ -7,6 +7,7 @@ php-image
 * [Rotate image](#rotate-image)
 * [Flip image](#flip-image)
 * [Filters](#filters)
+* [Writing text](#writing-text)
 * [Save image](#save-image)
 
 Installation
@@ -118,6 +119,28 @@ If you want to register own filter strategy to support new filters, extend class
 \Sokil\Image::addFilterStrategyNamespace('\Vendor\FilterStrategy')
 ```
 Classes searches in priority of adding.
+
+Writing text
+------------
+
+First we need to configure text element:
+```php
+$factory = new ImageFactory();
+        
+// text element
+$element = $factory
+    ->createTextElement()
+    ->setText('hello world')
+    ->setAngle(20)
+    ->setSize(40)
+    ->setColor('#ababab')
+    ->setFont(__DIR__ . '/FreeSerif.ttf');
+```
+
+Now we need to place element in image at some coordinates:
+```php
+$image->appendElementAtPosition($element, 50, 150);
+```
 
 Save image
 ----------
