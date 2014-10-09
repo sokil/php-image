@@ -106,6 +106,11 @@ class Image
 
         return $this;
     }
+    
+    public function create($width, $height)
+    {
+        $this->loadResource(imagecreatetruecolor($width, $height));
+    }
 
     public function getResource()
     {

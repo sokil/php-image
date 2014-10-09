@@ -45,6 +45,13 @@ $image = new \Sokil\Image('/path/to/image.jpeg');
 $image = new \Sokil\Image($imageResource);
 ```
 
+There is factory with helps you to create or open images:
+```
+$factory = new \Sokil\Image\Factory;
+$image = $factory->createImage(300, 200);
+$image = $factory->openImage('/path/to/file.png');
+```
+
 Resize image
 ------------
 
