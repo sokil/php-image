@@ -4,60 +4,81 @@ namespace Sokil;
 
 class ImageFactory
 {
-    private static $_writeStrategyNamespaces = array(
-        '\Sokil\Image\WriteStrategy',
-    );
+    private $_writeStrategyNamespaces = array();
     
-    private static $_resizeStrategyNamespaces = array(
-        '\Sokil\Image\ResizeStrategy',
-    );
+    private $_resizeStrategyNamespaces = array();
     
-    private static $_filterStrategyNamespaces = array(
-        '\Sokil\Image\FilterStrategy',
-    );
+    private $_filterStrategyNamespaces = array();
     
-    private static $_elementNamespaces = array(
+    private $_elementNamespaces = array(
         '\Sokil\Image\Element',
     );
     
-    public static function addWriteStrategyNamespace($namespace)
+    public function __construct(array $options = array())
     {
-        self::$_writeStrategyNamespaces[] = rtrim($namespace, '\\');
+        if(isset($options['namespace'])) {
+            
+            if(isset($options['namespace']['write'])) {
+                $this->addWriteStrategyNamespaces($options['namespace']['write']);
+            }
+            
+            if(isset($options['namespace']['resize'])) {
+                $this->addResizeStrategyNamespaces($options['namespace']['resize']);
+            }
+            
+            if(isset($options['namespace']['filter'])) {
+                $this->addFilterStrategyNamespaces($options['namespace']['write']);
+            }
+            
+            if(isset($options['namespace']['element'])) {
+                $this->addElementNamespaces($options['namespace']['element']);
+            }
+        }
     }
     
-    public static function getWriteStrategyNamespaces()
+    public function addWriteStrategyNamespace($namespace)
     {
-        return self::$_writeStrategyNamespaces;
+        $this->_writeStrategyNamespaces[] = rtrim($namespace, '\\');
+        return $this;
+    }
+    
+    public function addWriteStrategyNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addWriteStrategyNamespace'), $namespaces);
+        return $this;
     }
 
-    public static function addResizeStrategyNamespace($namespace)
+    public function addResizeStrategyNamespace($namespace)
     {
-        self::$_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
+        $this->_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
     }
     
-    public static function getResizeStrategyNamespaces()
+    public function addResizeStrategyNamespaces(array $namespaces)
     {
-        return self::$_resizeStrategyNamespaces;
+        array_map(array($this, 'addResizeStrategyNamespace'), $namespaces);
+        return $this;
     }
     
-    public static function addFilterStrategyNamespace($namespace)
+    public function addFilterStrategyNamespace($namespace)
     {
-        self::$_filterStrategyNamespaces[] = rtrim($namespace, '\\');
+        $this->_filterStrategyNamespaces[] = rtrim($namespace, '\\');
     }
     
-    public static function getFilterStrategyNamespaces()
+    public function addFilterStrategyNamespaces(array $namespaces)
     {
-        return self::$_filterStrategyNamespaces;
+        array_map(array($this, 'addFilterStrategyNamespace'), $namespaces);
+        return $this;
     }
 
-    public static function addElementNamespace($namespace)
+    public function addElementNamespace($namespace)
     {
-        self::$_elementNamespaces[] = rtrim($namespace, '\\');
+        $this->_elementNamespaces[] = rtrim($namespace, '\\');
     }
     
-    public static function getElementNamespaces()
+    public function addElementNamespaces(array $namespaces)
     {
-        return self::$_elementNamespaces;
+        array_map(array($this, 'addElementNamespace'), $namespaces);
+        return $this;
     }
     
     /**
@@ -92,7 +113,7 @@ class ImageFactory
      */
     public function createElement($name)
     {
-        foreach(self::$_elementNamespaces as $namespace) {
+        foreach($this->_elementNamespaces as $namespace) {
             $elementClassName = $namespace . '\\' . ucfirst(strtolower($name));
             if(!class_exists($elementClassName)) {
                 continue;

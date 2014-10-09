@@ -12,10 +12,21 @@ class Image
     private $_width;
     
     private $_height;
+    
+    private $_writeStrategyNamespaces = array(
+        '\Sokil\Image\WriteStrategy',
+    );
+    
+    private $_resizeStrategyNamespaces = array(
+        '\Sokil\Image\ResizeStrategy',
+    );
+    
+    private $_filterStrategyNamespaces = array(
+        '\Sokil\Image\FilterStrategy',
+    );
 
     public function __construct($image = null)
     {
-
         // load image
         if ($image) {
             if (is_string($image)) {
@@ -26,6 +37,40 @@ class Image
                 throw new \Exception('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
+    }
+    
+    public function addWriteStrategyNamespace($namespace)
+    {
+        $this->_writeStrategyNamespaces[] = rtrim($namespace, '\\');
+        return $this;
+    }
+    
+    public function addWriteStrategyNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addWriteStrategyNamespace'), $namespaces);
+        return $this;
+    }
+
+    public function addResizeStrategyNamespace($namespace)
+    {
+        $this->_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
+    }
+    
+    public function addResizeStrategyNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addResizeStrategyNamespace'), $namespaces);
+        return $this;
+    }
+    
+    public function addFilterStrategyNamespace($namespace)
+    {
+        $this->_filterStrategyNamespaces[] = rtrim($namespace, '\\');
+    }
+    
+    public function addFilterStrategyNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addFilterStrategyNamespace'), $namespaces);
+        return $this;
     }
 
     public function loadFile($filename)
@@ -124,7 +169,7 @@ class Image
     public function resize($mode, $width, $height)
     {
         // save strategy
-        foreach (ImageFactory::getResizeStrategyNamespaces() as $namespace) {
+        foreach ($this->_resizeStrategyNamespaces as $namespace) {
             $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($mode)) . 'ResizeStrategy';
             if (!class_exists($resizeStrategyClassName)) {
                 continue;
@@ -151,7 +196,7 @@ class Image
     public function write($format, $configuratorCallable)
     {
         // save strategy
-        foreach (ImageFactory::getWriteStrategyNamespaces() as $namespace) {
+        foreach ($this->_writeStrategyNamespaces as $namespace) {
             $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
             if (!class_exists($writeStrategyClassName)) {
                 continue;
@@ -291,7 +336,7 @@ class Image
     public function filter($name, $configuratorCallable = null)
     {
         // save strategy
-        foreach (ImageFactory::getFilterStrategyNamespaces() as $namespace) {
+        foreach ($this->_filterStrategyNamespaces as $namespace) {
             $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
             if (!class_exists($filterStrategyClassName)) {
                 continue;

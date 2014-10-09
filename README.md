@@ -31,32 +31,26 @@ You may install library through composer:
 Open image
 ----------
 
+Factory incapsulates instantiating of all image objects and aloow to confirure created images:
+```php
+$factory = new \Sokil\ImageFactory;
+```
+
 Opening from filename:
 
 ```php
-$image = new \Sokil\Image;
-$image->loadFile('/path/to/image.jpeg');
+$factory->openImage('/path/to/image.jpeg');
 ```
 
 Opening from GD resource:
 
 ```php
-$image = new \Sokil\Image;
-$image->loadResource($imageResource);
+$factory->openImage($imageResource);
 ```
 
-Passing to constructor of filename or image resource:
-
-```php
-$image = new \Sokil\Image('/path/to/image.jpeg');
-$image = new \Sokil\Image($imageResource);
+Creating new image:
 ```
-
-There is factory with helps you to create or open images:
-```
-$factory = new \Sokil\ImageFactory;
 $image = $factory->createImage(300, 200);
-$image = $factory->openImage('/path/to/file.png');
 ```
 
 Resize image
@@ -70,7 +64,16 @@ $newImage = $image->resize($mode, $width, $height);
 
 If you want to register own resize strategy, extend class from \Sokil\Image\AbstractResizeStrategy and add namespase:
 ```php
-\Sokil\ImageFactory::addWriteStrategyNamespace('\Vendor\ResizeStrategy')
+// through factory constructor
+$factory = new \Sokil\ImageFactory([
+    'namespace' => [
+        'resize' => '\Vendor\ResizeStrategy',
+    ],
+]);
+// through factory method
+$factory->addResizeStrategyNamespace('\Vendor\ResizeStrategy');
+// directly to image
+$image->addResizeStrategyNamespace('\Vendor\ResizeStrategy');
 ```
 Classes searches in priority of adding.
 
@@ -122,7 +125,16 @@ $newImage = $image->filter('greyscale');
 
 If you want to register own filter strategy to support new filters, extend class from \Sokil\Image\AbstractFilterStrategy and add namespase:
 ```php
-\Sokil\ImageFactory::addFilterStrategyNamespace('\Vendor\FilterStrategy')
+// through factory constructor
+$factory = new \Sokil\ImageFactory([
+    'namespace' => [
+        'filter' => '\Vendor\FilterStrategy',
+    ],
+]);
+// through factory method
+$factory->addFilterStrategyNamespace('\Vendor\FilterStrategy');
+// or directly to image
+$image->addFilterStrategyNamespace('\Vendor\FilterStrategy');
 ```
 Classes searches in priority of adding.
 
@@ -141,7 +153,7 @@ Than element placed to image to some coordinates:
 $image->appendElementAtPosition($someElement, 30, 30);
 ```
 
-You can create your own elements thet inherits \Sokil\Image\AbstractElement class, and register namespace:
+You can create your own elements that inherits \Sokil\Image\AbstractElement class, and register namespace:
 ```php
 namespace Vendor\Elements;
 
@@ -155,7 +167,14 @@ class Circle extends \Sokil\Image\AbstractElement
     }
 }
 
-\Sokil\ImageFactory::addElementNamespace('\Vendor\Elements');
+// through factory constructor
+$factory = new \Sokil\ImageFactory([
+    'namespace' => [
+        'element' => '\Vendor\Element',
+    ],
+]);
+// through factory method
+$factory->addElementNamespace('\Vendor\Elements');
 ```
 
 Now you can draw your own circles:
@@ -213,6 +232,15 @@ $image->write('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $str
 
 If you want to register own write strategy to support new image format, extend class from \Sokil\Image\AbstractWriteStrategy and add namespase:
 ```php
-\Sokil\ImageFactory::addWriteStrategyNamespace('\Vendor\WriteStrategy')
+// through factory constructor
+$factory = new \Sokil\ImageFactory([
+    'namespace' => [
+        'write' => '\Vendor\WriteStrategy',
+    ],
+]);
+// through factory method
+$factory->addWriteStrategyNamespace('\Vendor\WriteStrategy');
+// or directly to image
+$image->addWriteStrategyNamespace('\Vendor\WriteStrategy');
 ```
 Classes searches in priority of adding.
