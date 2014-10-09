@@ -166,6 +166,13 @@ $image->appendElementAtPosition($circle, 100, 100);
 
 ### Writing text
 
+To create text element you can use one of methods: 
+```php
+$textElement = $factory->createElement('text');
+// or through helper 
+$textElement = $factory->createTextElement();
+```
+
 First we need to configure text element:
 ```php
 $factory = new ImageFactory();
