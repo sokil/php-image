@@ -1,6 +1,10 @@
 php-image
 =========
 
+[![Build Status](https://travis-ci.org/sokil/php-image.png?branch=master&1)](https://travis-ci.org/sokil/php-mongo)
+[![Latest Stable Version](https://poser.pugx.org/sokil/php-image/v/stable.png)](https://packagist.org/packages/sokil/php-image)
+
+
 * [Installation](#installation)
 * [Open image](#open-image)
 * [Resize image](#resize-image)
