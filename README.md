@@ -3,7 +3,7 @@ php-image
 
 [![Build Status](https://travis-ci.org/sokil/php-image.png?branch=master&1)](https://travis-ci.org/sokil/php-mongo)
 [![Latest Stable Version](https://poser.pugx.org/sokil/php-image/v/stable.png)](https://packagist.org/packages/sokil/php-image)
-
+[![Coverage Status](https://coveralls.io/repos/sokil/php-image/badge.png?branch=master)](https://coveralls.io/r/sokil/php-image?branch=master)
 
 * [Installation](#installation)
 * [Open image](#open-image)
