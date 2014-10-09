@@ -70,7 +70,7 @@ $newImage = $image->resize($mode, $width, $height);
 
 If you want to register own resize strategy, extend class from \Sokil\Image\AbstractResizeStrategy and add namespase:
 ```php
-\Sokil\Image::addWriteStrategyNamespace('\Vendor\ResizeStrategy')
+\Sokil\ImageFactory::addWriteStrategyNamespace('\Vendor\ResizeStrategy')
 ```
 Classes searches in priority of adding.
 
@@ -122,7 +122,7 @@ $newImage = $image->filter('greyscale');
 
 If you want to register own filter strategy to support new filters, extend class from \Sokil\Image\AbstractFilterStrategy and add namespase:
 ```php
-\Sokil\Image::addFilterStrategyNamespace('\Vendor\FilterStrategy')
+\Sokil\ImageFactory::addFilterStrategyNamespace('\Vendor\FilterStrategy')
 ```
 Classes searches in priority of adding.
 
@@ -213,6 +213,6 @@ $image->write('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $str
 
 If you want to register own write strategy to support new image format, extend class from \Sokil\Image\AbstractWriteStrategy and add namespase:
 ```php
-\Sokil\Image::addWriteStrategyNamespace('\Vendor\WriteStrategy')
+\Sokil\ImageFactory::addWriteStrategyNamespace('\Vendor\WriteStrategy')
 ```
 Classes searches in priority of adding.

@@ -13,18 +13,6 @@ class Image
     
     private $_height;
 
-    private static $_writeStrategyNamespaces = array(
-        '\Sokil\Image\WriteStrategy',
-    );
-    
-    private static $_resizeStrategyNamespaces = array(
-        '\Sokil\Image\ResizeStrategy',
-    );
-    
-    private static $_filterStrategyNamespaces = array(
-        '\Sokil\Image\FilterStrategy',
-    );
-
     public function __construct($image = null)
     {
 
@@ -38,21 +26,6 @@ class Image
                 throw new \Exception('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
-    }
-
-    public static function addWriteStrategyNamespace($namespace)
-    {
-        self::$_writeStrategyNamespaces[] = rtrim($namespace, '\\');
-    }
-
-    public static function addResizeStrategyNamespace($namespace)
-    {
-        self::$_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
-    }
-    
-    public static function addFilterStrategyNamespace($namespace)
-    {
-        self::$_filterStrategyNamespaces[] = rtrim($namespace, '\\');
     }
 
     public function loadFile($filename)
@@ -151,7 +124,7 @@ class Image
     public function resize($mode, $width, $height)
     {
         // save strategy
-        foreach (self::$_resizeStrategyNamespaces as $namespace) {
+        foreach (ImageFactory::getResizeStrategyNamespaces() as $namespace) {
             $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($mode)) . 'ResizeStrategy';
             if (!class_exists($resizeStrategyClassName)) {
                 continue;
@@ -178,7 +151,7 @@ class Image
     public function write($format, $configuratorCallable)
     {
         // save strategy
-        foreach (self::$_writeStrategyNamespaces as $namespace) {
+        foreach (ImageFactory::getWriteStrategyNamespaces() as $namespace) {
             $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
             if (!class_exists($writeStrategyClassName)) {
                 continue;
@@ -318,7 +291,7 @@ class Image
     public function filter($name, $configuratorCallable = null)
     {
         // save strategy
-        foreach (self::$_filterStrategyNamespaces as $namespace) {
+        foreach (ImageFactory::getFilterStrategyNamespaces() as $namespace) {
             $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
             if (!class_exists($filterStrategyClassName)) {
                 continue;

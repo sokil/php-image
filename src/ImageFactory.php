@@ -4,13 +4,60 @@ namespace Sokil;
 
 class ImageFactory
 {
+    private static $_writeStrategyNamespaces = array(
+        '\Sokil\Image\WriteStrategy',
+    );
+    
+    private static $_resizeStrategyNamespaces = array(
+        '\Sokil\Image\ResizeStrategy',
+    );
+    
+    private static $_filterStrategyNamespaces = array(
+        '\Sokil\Image\FilterStrategy',
+    );
+    
     private static $_elementNamespaces = array(
         '\Sokil\Image\Element',
     );
+    
+    public static function addWriteStrategyNamespace($namespace)
+    {
+        self::$_writeStrategyNamespaces[] = rtrim($namespace, '\\');
+    }
+    
+    public static function getWriteStrategyNamespaces()
+    {
+        return self::$_writeStrategyNamespaces;
+    }
+
+    public static function addResizeStrategyNamespace($namespace)
+    {
+        self::$_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
+    }
+    
+    public static function getResizeStrategyNamespaces()
+    {
+        return self::$_resizeStrategyNamespaces;
+    }
+    
+    public static function addFilterStrategyNamespace($namespace)
+    {
+        self::$_filterStrategyNamespaces[] = rtrim($namespace, '\\');
+    }
+    
+    public static function getFilterStrategyNamespaces()
+    {
+        return self::$_filterStrategyNamespaces;
+    }
 
     public static function addElementNamespace($namespace)
     {
         self::$_elementNamespaces[] = rtrim($namespace, '\\');
+    }
+    
+    public static function getElementNamespaces()
+    {
+        return self::$_elementNamespaces;
     }
     
     /**
