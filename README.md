@@ -11,7 +11,8 @@ php-image
 * [Rotate image](#rotate-image)
 * [Flip image](#flip-image)
 * [Filters](#filters)
-* [Writing text](#writing-text)
+* [Adding elements to image](#adding-elements-to-image)
+  * [Writing text](#writing-text)
 * [Save image](#save-image)
 
 Installation
@@ -124,8 +125,43 @@ If you want to register own filter strategy to support new filters, extend class
 ```
 Classes searches in priority of adding.
 
-Writing text
-------------
+Adding elements to image
+------------------------
+
+Element is everything that can me append to image: text, shape, other image. First we need to create element instabce and configure it:
+```php
+$someElement = $factory->createSelemet('someElement')->setParam1('someValue');
+```
+
+Than element placed to image to some coordinates:
+```php
+$image->appendElementAtPosition($someElement, 30, 30);
+```
+
+You can create your own elements thet inherits \Sokil\Image\AbstractElement class, and register namespace:
+```php
+namespace Vendor\Elements;
+
+class Circle extends \Sokil\Image\AbstractElement
+{
+    public function setRadius($r) { // code to set radius }
+    
+    public function draw($resource, $x, $y) 
+    {
+        // code to draw circle on image $resouce at coordinates ($x, $y)
+    }
+}
+
+\Sokil\ImageFactory::addElementNamespace('\Vendor\Elements');
+```
+
+Now you can draw your own circles:
+```php
+$circle = $factory->createElement('circle')->setRadiud(100);
+$image->appendElementAtPosition($circle, 100, 100);
+```
+
+### Writing text
 
 First we need to configure text element:
 ```php
