@@ -11,7 +11,8 @@ php-image
 * [Rotate image](#rotate-image)
 * [Flip image](#flip-image)
 * [Filters](#filters)
-* [Adding elements to image](#adding-elements-to-image)
+* [Image elements](#image-elements)
+  * [Adding elements to image](#adding-elements-to-image)
   * [Writing text](#writing-text)
 * [Save image](#save-image)
 
@@ -125,8 +126,10 @@ If you want to register own filter strategy to support new filters, extend class
 ```
 Classes searches in priority of adding.
 
-Adding elements to image
-------------------------
+Image elements
+--------------
+
+### Adding elements to image
 
 Element is everything that can me append to image: text, shape, other image. First we need to create element instabce and configure it:
 ```php
