@@ -145,7 +145,7 @@ Image elements
 
 Element is everything that can me append to image: text, shape, other image. First we need to create element instabce and configure it:
 ```php
-$someElement = $factory->createSelemet('someElement')->setParam1('someValue');
+$someElement = $factory->createElement('someElement')->setParam1('someValue');
 ```
 
 Than element placed to image to some coordinates:
