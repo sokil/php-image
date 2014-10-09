@@ -18,7 +18,7 @@ class JpegWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
     
     public function toFile($targetPath)
     {
-        if(!in_array(strtolower(pathinfo($targetPath, PATHINFO_EXTENSION)), ['jpg', 'jpeg'])) {
+        if(!in_array(strtolower(pathinfo($targetPath, PATHINFO_EXTENSION)), array('jpg', 'jpeg'))) {
             $targetPath .= '.jpg';
         }
         
