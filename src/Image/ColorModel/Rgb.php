@@ -114,11 +114,11 @@ class Rgb
     
     public static function fromIntAsArray($intColor)
     {
-        return [
+        return array(
             ($intColor >> 16) & 0xFF,
             ($intColor >> 8) & 0xFF,
             $intColor & 0xFF,
-        ];
+        );
     }
     
     public function getRed()
@@ -143,6 +143,6 @@ class Rgb
     
     public function toArray()
     {
-        return [$this->red, $this->green, $this->blue, $this->alpha];
+        return array($this->red, $this->green, $this->blue, $this->alpha);
     }
 }
