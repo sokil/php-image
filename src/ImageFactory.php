@@ -1,8 +1,8 @@
 <?php
 
-namespace Sokil\Image;
+namespace Sokil;
 
-class Factory
+class ImageFactory
 {
     /**
      * Create empty image
