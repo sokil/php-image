@@ -72,6 +72,11 @@ class Image
         array_map(array($this, 'addFilterStrategyNamespace'), $namespaces);
         return $this;
     }
+    
+    public function create($width, $height)
+    {
+        return $this->loadResource(imagecreatetruecolor($width, $height));
+    }
 
     public function loadFile($filename)
     {
@@ -126,9 +131,19 @@ class Image
         return $this;
     }
     
-    public function create($width, $height)
+    public function getResource()
     {
-        return $this->loadResource(imagecreatetruecolor($width, $height));
+        return $this->_resource;
+    }
+
+    public function getWidth()
+    {
+        return $this->_width;
+    }
+
+    public function getHeight()
+    {
+        return $this->_height;
     }
     
     public function fill($color, $x = 0, $y = 0)
@@ -151,21 +166,6 @@ class Image
         return $this;
     }
 
-    public function getResource()
-    {
-        return $this->_resource;
-    }
-
-    public function getWidth()
-    {
-        return $this->_width;
-    }
-
-    public function getHeight()
-    {
-        return $this->_height;
-    }
-
     public function resize($mode, $width, $height)
     {
         // save strategy
@@ -186,7 +186,9 @@ class Image
             throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
         }
 
-        return new self($resizeStrategy->resize($this->_resource, $width, $height));
+        $this->loadResource($resizeStrategy->resize($this->_resource, $width, $height));
+        
+        return $this;
     }
 
     /**
@@ -212,9 +214,16 @@ class Image
             throw new \Exception('Write strategy must extend AbstractWriteStrategy');
         }
 
-        return call_user_func(
-            $configuratorCallable, $writeStrategy
+        if(!is_callable($configuratorCallable)) {
+            throw new \Exception('Wrong configurator specified');
+        }
+        
+        call_user_func(
+            $configuratorCallable, 
+            $writeStrategy
         );
+        
+        return $this;
     }
 
     /**
@@ -243,17 +252,23 @@ class Image
         imagealphablending($rotatedImageResource, false);
         imagesavealpha($rotatedImageResource, true);
 
-        return new self($rotatedImageResource);
+        $this->loadResource($rotatedImageResource);
+        
+        return $this;
     }
 
     public function flipVertical()
     {
         // use native function
         if(version_compare(PHP_VERSION, '5.5', '>=')) {
-            return new self(imageflip($this->_resource, IMG_FLIP_VERTICAL));
+            $resource = imageflip($this->_resource, IMG_FLIP_VERTICAL);
+        } else {
+            $resource = $this->_flipVertical();
         }
+        
+        $this->loadResource($resource);
 
-        return $this->_flipVertical();
+        return $this;
     }
     
     private function _flipVertical()
@@ -272,17 +287,21 @@ class Image
             }
         }
         
-        return new self($flippedImageResource);
+        return $flippedImageResource;
     }
 
     public function flipHorizontal()
     {
         // use native function
         if(version_compare(PHP_VERSION, '5.5', '>=')) {
-            return new self(imageflip($this->_resource, IMG_FLIP_HORIZONTAL));
+            $resource = imageflip($this->_resource, IMG_FLIP_HORIZONTAL);
+        } else {
+            $resource = $this->_flipHorizontal();
         }
+        
+        $this->loadResource($resource);
 
-        return $this->_flipHorizontal();
+        return $this;
     }
     
     private function _flipHorizontal()
@@ -301,17 +320,21 @@ class Image
             }
         }
         
-        return new self($flippedImageResource);
+        return $flippedImageResource;
     }
 
     public function flipBoth()
     {
         // use native function
         if(version_compare(PHP_VERSION, '5.5', '>=')) {
-            return new self(imageflip($this->_resource, IMG_FLIP_BOTH));
+            $resource = imageflip($this->_resource, IMG_FLIP_BOTH);
+        } else {
+            $resource = $this->_flipBoth();
         }
+        
+        $this->loadResource($resource);
 
-        return $this->_flipBoth();
+        return $this;
     }
     
     private function _flipBoth()
@@ -330,7 +353,7 @@ class Image
             }
         }
         
-        return new self($flippedImageResource);
+        return $flippedImageResource;
     }
     
     public function filter($name, $configuratorCallable = null)
@@ -357,7 +380,9 @@ class Image
             call_user_func($configuratorCallable, $filterStrategy);
         }
         
-        return new self($filterStrategy->filter());
+        $this->loadResource($filterStrategy->filter());
+        
+        return $this;
     }
     
     public function appendElementAtPosition(AbstractElement $element, $x, $y)
