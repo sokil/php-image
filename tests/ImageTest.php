@@ -215,6 +215,6 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         
         $this->assertEquals(10, imagesx($image->getResource()));
         $this->assertEquals(10, imagesy($image->getResource()));
-        $this->assertEquals([0, 0, 255, 0], Rgb::fromInt(imagecolorat($image->getResource(), 5, 5))->toArray());
+        $this->assertEquals(array(0, 0, 255, 0), Rgb::fromInt(imagecolorat($image->getResource(), 5, 5))->toArray());
     }
 }
