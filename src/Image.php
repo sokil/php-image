@@ -13,10 +13,6 @@ class Image
     
     private $_height;
     
-    private $_writeStrategyNamespaces = array(
-        '\Sokil\Image\WriteStrategy',
-    );
-    
     private $_resizeStrategyNamespaces = array(
         '\Sokil\Image\ResizeStrategy',
     );
@@ -37,18 +33,6 @@ class Image
                 throw new \Exception('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
-    }
-    
-    public function addWriteStrategyNamespace($namespace)
-    {
-        $this->_writeStrategyNamespaces[] = rtrim($namespace, '\\');
-        return $this;
-    }
-    
-    public function addWriteStrategyNamespaces(array $namespaces)
-    {
-        array_map(array($this, 'addWriteStrategyNamespace'), $namespaces);
-        return $this;
     }
 
     public function addResizeStrategyNamespace($namespace)
@@ -192,36 +176,11 @@ class Image
     }
 
     /**
-     * @param string $format
      * @return \Sokil\Image\AbstractWriteStrategy
      */
-    public function write($format, $configuratorCallable)
+    public function write(\Sokil\Image\AbstractWriteStrategy $writeStrategy)
     {
-        // save strategy
-        foreach ($this->_writeStrategyNamespaces as $namespace) {
-            $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
-            if (!class_exists($writeStrategyClassName)) {
-                continue;
-            }
-        }
-
-        if (!isset($writeStrategyClassName)) {
-            throw new \Exception('Format ' . $format . ' not supported');
-        }
-
-        $writeStrategy = new $writeStrategyClassName($this->_resource);
-        if (!($writeStrategy instanceof \Sokil\Image\AbstractWriteStrategy)) {
-            throw new \Exception('Write strategy must extend AbstractWriteStrategy');
-        }
-
-        if(!is_callable($configuratorCallable)) {
-            throw new \Exception('Wrong configurator specified');
-        }
-        
-        call_user_func(
-            $configuratorCallable, 
-            $writeStrategy
-        );
+        $writeStrategy->write($this->_resource);
         
         return $this;
     }

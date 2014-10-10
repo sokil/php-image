@@ -32,12 +32,13 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.jpg';
         
         $image = $this->_factory->openImage($sourceFilename);
-        $image
-            ->write('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $writeStrategy) use($targetFilename) {                
-                $writeStrategy
-                    ->setQuality(100)
-                    ->toFile($targetFilename);
-            });
+        $this->_factory->writeImage(
+            $image, 
+            'jpeg', 
+            function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $writeStrategy) use($targetFilename) {                
+                $writeStrategy->setQuality(100)->toFile($targetFilename);
+            }
+        );
             
         // check file existance
         $this->assertFileExists($targetFilename);
@@ -55,10 +56,13 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.gif';
         
         $image = $this->_factory->openImage($sourceFilename);
-        $image
-            ->write('gif', function(\Sokil\Image\WriteStrategy\GifWriteStrategy $writeStrategy) use($targetFilename) {                
+        $this->_factory->writeImage(
+            $image,
+            'gif', 
+            function(\Sokil\Image\WriteStrategy\GifWriteStrategy $writeStrategy) use($targetFilename) {                
                 $writeStrategy->toFile($targetFilename);
-            });
+            }
+        );
             
         // check file existance
         $this->assertFileExists($targetFilename);
@@ -76,12 +80,13 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.png';
         
         $image = $this->_factory->openImage($sourceFilename);
-        $image
-            ->write('png', function(\Sokil\Image\WriteStrategy\PngWriteStrategy $writeStrategy) use($targetFilename) {                
-                $writeStrategy
-                    ->setQuality(9)
-                    ->toFile($targetFilename);
-            });
+        $this->_factory->writeImage(
+            $image,
+            'png', 
+            function(\Sokil\Image\WriteStrategy\PngWriteStrategy $writeStrategy) use($targetFilename) {                
+                $writeStrategy->setQuality(9)->toFile($targetFilename);
+            }
+        );
             
         // check file existance
         $this->assertFileExists($targetFilename);

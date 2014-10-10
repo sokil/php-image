@@ -4,25 +4,22 @@ namespace Sokil\Image;
 
 abstract class AbstractWriteStrategy
 {
-    protected $_resource;
-    
+    /**
+     * if null - write to STDOUT
+     * 
+     * @var string|null path to file where to write image
+     */
     protected $_targetPath;
-
-    public function __construct($resource)
-    {
-        $this->_resource = $resource;
-        if(!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
-            throw new \Exception('Resource must be given');
-        }
-    }
 
     /**
      * Write resource to file
      */
-    abstract public function toFile($targetPath);
+    public function toFile($targetPath)
+    {
+        $this->_targetPath = $targetPath;
+        
+        return $this;
+    }
     
-    /**
-     * Write resource to STDOUT
-     */
-    abstract public function toStdout();
+    abstract public function write($resource);
 }

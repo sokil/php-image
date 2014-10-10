@@ -60,19 +60,20 @@ class PngWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
         return $this;
     }
     
-    public function toFile($targetPath)
+    public function write($resource)
     {
+        if(!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
+            throw new \Exception('Resource must be given');
+        }
+        
+        $targetPath = $this->_targetPath;
+        
         if('png' !== strtolower(pathinfo($targetPath, PATHINFO_EXTENSION))) {
             $targetPath .= '.png';
         }
         
-        if(!imagepng($this->_resource, $targetPath, $this->_quality, $this->_filter)) {
+        if(!imagepng($resource, $targetPath, $this->_quality, $this->_filter)) {
             throw new \Exception('Error writing PNG file');
         }
-    }
-    
-    public function toStdout()
-    {
-        imagepng($this->_resource, null, $this->_quality, $this->_filter);
     }
 }

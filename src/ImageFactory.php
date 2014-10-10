@@ -4,7 +4,9 @@ namespace Sokil;
 
 class ImageFactory
 {
-    private $_writeStrategyNamespaces = array();
+    private $_writeStrategyNamespaces = array(
+        '\Sokil\Image\WriteStrategy',
+    );
     
     private $_resizeStrategyNamespaces = array();
     
@@ -101,6 +103,43 @@ class ImageFactory
     public function openImage($image)
     {
         return new Image($image);
+    }
+    
+    /**
+     * @param string $format
+     * @return \Sokil\Image\AbstractWriteStrategy
+     */
+    public function writeImage(Image $image, $format, $configuratorCallable = null)
+    {
+        // save strategy
+        foreach ($this->_writeStrategyNamespaces as $namespace) {
+            $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
+            if (!class_exists($writeStrategyClassName)) {
+                continue;
+            }
+        }
+
+        if (!isset($writeStrategyClassName)) {
+            throw new \Exception('Format ' . $format . ' not supported');
+        }
+
+        $writeStrategy = new $writeStrategyClassName;
+        if (!($writeStrategy instanceof \Sokil\Image\AbstractWriteStrategy)) {
+            throw new \Exception('Write strategy must extend AbstractWriteStrategy');
+        }
+        
+        // configure 
+        if($configuratorCallable) {
+            if(!is_callable($configuratorCallable)) {
+                throw new \Exception('Wrong configurator specified');
+            }
+
+            call_user_func($configuratorCallable, $writeStrategy);
+        }
+        
+        $image->write($writeStrategy);
+        
+        return $this;
     }
     
     /**

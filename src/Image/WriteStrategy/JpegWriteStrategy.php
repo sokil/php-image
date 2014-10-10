@@ -16,19 +16,20 @@ class JpegWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
         return $this;
     }
     
-    public function toFile($targetPath)
+    public function write($resource)
     {
+        if(!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
+            throw new \Exception('Resource must be given');
+        }
+        
+        $targetPath = $this->_targetPath;
+        
         if(!in_array(strtolower(pathinfo($targetPath, PATHINFO_EXTENSION)), array('jpg', 'jpeg'))) {
             $targetPath .= '.jpg';
         }
         
-        if(!imagejpeg($this->_resource, $targetPath, $this->_quality)) {
+        if(!imagejpeg($resource, $targetPath, $this->_quality)) {
             throw new \Exception('Error writing JPEG file');
         }
-    }
-    
-    public function toStdout()
-    {
-        imagejpeg($this->_resource, null, $this->_quality);
     }
 }
