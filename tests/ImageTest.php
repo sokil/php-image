@@ -174,12 +174,12 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testGreyscale()
     {
         $image = $this->_factory->openImage(__DIR__ . '/test.png');
-        $greyscaleImage = $image->filter('greyscale');
+        $this->_factory->filterImage($image, 'greyscale');
         
-        $color = imagecolorat($greyscaleImage->getResource(), 0, 0);
+        $color = imagecolorat($image->getResource(), 0, 0);
         $this->assertEquals(array(29, 29, 29), Rgb::fromIntAsArray($color));
         
-        $color = imagecolorat($greyscaleImage->getResource(), 0, 199);
+        $color = imagecolorat($image->getResource(), 0, 199);
         $this->assertEquals(array(225, 225, 225), Rgb::fromIntAsArray($color));
     }
     

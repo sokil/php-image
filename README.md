@@ -120,7 +120,7 @@ Filters
 
 Greyscale image:
 ```php
-$newImage = $image->filter('greyscale');
+$factory->filterImage($image, 'greyscale');
 ```
 
 If you want to register own filter strategy to support new filters, extend class from \Sokil\Image\AbstractFilterStrategy and add namespase:

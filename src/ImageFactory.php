@@ -12,7 +12,9 @@ class ImageFactory
         '\Sokil\Image\ResizeStrategy',
     );
     
-    private $_filterStrategyNamespaces = array();
+    private $_filterStrategyNamespaces = array(
+        '\Sokil\Image\FilterStrategy',
+    );
     
     private $_elementNamespaces = array(
         '\Sokil\Image\Element',
@@ -128,6 +130,35 @@ class ImageFactory
         }
 
         $image->resize($resizeStrategy, $width, $height);
+        
+        return $this;
+    }
+    
+    public function filterImage(Image $image, $name, $configuratorCallable = null)
+    {
+        // save strategy
+        foreach ($this->_filterStrategyNamespaces as $namespace) {
+            $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
+            if (!class_exists($filterStrategyClassName)) {
+                continue;
+            }
+        }
+
+        if (!isset($filterStrategyClassName)) {
+            throw new \Exception('Filter ' . $name . ' not supported');
+        }
+
+        $filterStrategy = new $filterStrategyClassName;
+        if (!($filterStrategy instanceof \Sokil\Image\AbstractFilterStrategy)) {
+            throw new \Exception('Filter strategy must extend AbstractFilterStrategy');
+        }
+
+        // configure strategy
+        if($configuratorCallable) {
+            call_user_func($configuratorCallable, $filterStrategy);
+        }
+        
+        $image->filter($filterStrategy);
         
         return $this;
     }

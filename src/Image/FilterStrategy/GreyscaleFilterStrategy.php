@@ -7,11 +7,15 @@ use Sokil\Image\ColorModel\Yiq;
 
 class GreyscaleFilterStrategy extends \Sokil\Image\AbstractFilterStrategy
 {
-    public function filter()
+    public function filter($resource)
     {
-        $width = imagesx($this->_resource);
+        if(!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
+            throw new \Exception('Resource must be given');
+        }
         
-        $height = imagesy($this->_resource);
+        $width = imagesx($resource);
+        
+        $height = imagesy($resource);
         
         $greyscaleImageResource = imagecreatetruecolor(
             $width, 
@@ -26,7 +30,7 @@ class GreyscaleFilterStrategy extends \Sokil\Image\AbstractFilterStrategy
         // set pixels
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
-                $rgb = imagecolorat($this->_resource, $x, $y);
+                $rgb = imagecolorat($resource, $x, $y);
                 $grey = Yiq::getYFromRgbArray(Rgb::fromIntAsArray($rgb));
                 imagesetpixel($greyscaleImageResource, $x, $y, $palette[$grey]);
             }

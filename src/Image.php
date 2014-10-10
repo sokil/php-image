@@ -12,10 +12,6 @@ class Image
     private $_width;
     
     private $_height;
-    
-    private $_filterStrategyNamespaces = array(
-        '\Sokil\Image\FilterStrategy',
-    );
 
     public function __construct($image = null)
     {
@@ -29,17 +25,6 @@ class Image
                 throw new \Exception('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
-    }
-    
-    public function addFilterStrategyNamespace($namespace)
-    {
-        $this->_filterStrategyNamespaces[] = rtrim($namespace, '\\');
-    }
-    
-    public function addFilterStrategyNamespaces(array $namespaces)
-    {
-        array_map(array($this, 'addFilterStrategyNamespace'), $namespaces);
-        return $this;
     }
     
     public function create($width, $height)
@@ -282,31 +267,9 @@ class Image
         return $flippedImageResource;
     }
     
-    public function filter($name, $configuratorCallable = null)
+    public function filter(\Sokil\Image\AbstractFilterStrategy $filterStrategy)
     {
-        // save strategy
-        foreach ($this->_filterStrategyNamespaces as $namespace) {
-            $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
-            if (!class_exists($filterStrategyClassName)) {
-                continue;
-            }
-        }
-
-        if (!isset($filterStrategyClassName)) {
-            throw new \Exception('Filter ' . $name . ' not supported');
-        }
-
-        $filterStrategy = new $filterStrategyClassName($this->_resource);
-        if (!($filterStrategy instanceof \Sokil\Image\AbstractFilterStrategy)) {
-            throw new \Exception('Filter strategy must extend AbstractFilterStrategy');
-        }
-
-        // configure strategy
-        if($configuratorCallable) {
-            call_user_func($configuratorCallable, $filterStrategy);
-        }
-        
-        $this->loadResource($filterStrategy->filter());
+        $this->loadResource($filterStrategy->filter($this->_resource));
         
         return $this;
     }
