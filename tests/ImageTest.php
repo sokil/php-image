@@ -207,4 +207,14 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         
         $this->assertEquals(array(255, 0, 0, 0), $color);
     }
+    
+    public function testCrop()
+    {
+        $image = $this->_factory->openImage(__DIR__ . '/test.png');
+        $image->crop(10, 10, 10, 10);
+        
+        $this->assertEquals(10, imagesx($image->getResource()));
+        $this->assertEquals(10, imagesy($image->getResource()));
+        $this->assertEquals([0, 0, 255, 0], Rgb::fromInt(imagecolorat($image->getResource(), 5, 5))->toArray());
+    }
 }

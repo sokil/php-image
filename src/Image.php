@@ -274,6 +274,25 @@ class Image
         return $this;
     }
     
+    public function crop($x, $y, $width, $height)
+    {
+        $croppedImageResource = imagecreatetruecolor($width, $height);
+        imagecopyresampled(
+            $croppedImageResource, 
+            $this->_resource, 
+            0, 
+            0, 
+            $x, 
+            $y, 
+            $width, 
+            $height, 
+            $width, 
+            $height
+        );
+        
+        $this->loadResource($croppedImageResource);
+    }
+    
     public function appendElementAtPosition(AbstractElement $element, $x, $y)
     {
         $element->draw($this->_resource, $x, $y);

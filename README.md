@@ -8,6 +8,7 @@ php-image
 * [Installation](#installation)
 * [Open image](#open-image)
 * [Resize image](#resize-image)
+* [Crop image](#crop-image)
 * [Rotate image](#rotate-image)
 * [Flip image](#flip-image)
 * [Filters](#filters)
@@ -76,6 +77,19 @@ $factory->addResizeStrategyNamespace('\Vendor\ResizeStrategy');
 $image->addResizeStrategyNamespace('\Vendor\ResizeStrategy');
 ```
 Classes searches in priority of adding.
+
+Crop image
+----------
+
+To get part of image by specified wifth and height and in defined coordinates use:
+```php
+$x = 10;
+$y = 10;
+$width = 20;
+$height = 20;
+
+$image->crop($x, $y, $width, $height);
+```
 
 Rotate image
 ------------
