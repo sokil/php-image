@@ -101,10 +101,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testResize()
     {
         $image = $this->_factory->openImage(__DIR__ . '/test.png');
-        $resizedImage = $image->resize('scale', 100, 200);
+        $this->_factory->resizeImage($image, 'scale', 100, 200);
         
-        $this->assertEquals(100, $resizedImage->getWidth());
-        $this->assertEquals(66, $resizedImage->getHeight());
+        $this->assertEquals(100, $image->getWidth());
+        $this->assertEquals(66, $image->getHeight());
     }
     
     public function testRotate()

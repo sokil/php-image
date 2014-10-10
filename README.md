@@ -59,7 +59,7 @@ Resize image
 There is four resize modes: 'scale', 'fit', 'crop' and 'cache'.
 
 ```php
-$newImage = $image->resize($mode, $width, $height);
+$newImage = $factory->resizeImage($image, $mode, $width, $height);
 ```
 
 If you want to register own resize strategy, extend class from \Sokil\Image\AbstractResizeStrategy and add namespase:

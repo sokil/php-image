@@ -8,7 +8,9 @@ class ImageFactory
         '\Sokil\Image\WriteStrategy',
     );
     
-    private $_resizeStrategyNamespaces = array();
+    private $_resizeStrategyNamespaces = array(
+        '\Sokil\Image\ResizeStrategy',
+    );
     
     private $_filterStrategyNamespaces = array();
     
@@ -103,6 +105,31 @@ class ImageFactory
     public function openImage($image)
     {
         return new Image($image);
+    }
+    
+    public function resizeImage(Image $image, $mode, $width, $height)
+    {
+        // save strategy
+        foreach ($this->_resizeStrategyNamespaces as $namespace) {
+            $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($mode)) . 'ResizeStrategy';
+            if (!class_exists($resizeStrategyClassName)) {
+                continue;
+            }
+        }
+
+        if (!isset($resizeStrategyClassName)) {
+            throw new \Exception('Resize mode ' . $mode . ' not supported');
+        }
+
+        /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
+        $resizeStrategy = new $resizeStrategyClassName();
+        if (!($resizeStrategy instanceof \Sokil\Image\AbstractResizeStrategy)) {
+            throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
+        }
+
+        $image->resize($resizeStrategy, $width, $height);
+        
+        return $this;
     }
     
     /**

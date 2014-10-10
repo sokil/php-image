@@ -13,10 +13,6 @@ class Image
     
     private $_height;
     
-    private $_resizeStrategyNamespaces = array(
-        '\Sokil\Image\ResizeStrategy',
-    );
-    
     private $_filterStrategyNamespaces = array(
         '\Sokil\Image\FilterStrategy',
     );
@@ -33,17 +29,6 @@ class Image
                 throw new \Exception('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
-    }
-
-    public function addResizeStrategyNamespace($namespace)
-    {
-        $this->_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
-    }
-    
-    public function addResizeStrategyNamespaces(array $namespaces)
-    {
-        array_map(array($this, 'addResizeStrategyNamespace'), $namespaces);
-        return $this;
     }
     
     public function addFilterStrategyNamespace($namespace)
@@ -150,26 +135,8 @@ class Image
         return $this;
     }
 
-    public function resize($mode, $width, $height)
+    public function resize(\Sokil\Image\AbstractResizeStrategy $resizeStrategy, $width, $height)
     {
-        // save strategy
-        foreach ($this->_resizeStrategyNamespaces as $namespace) {
-            $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($mode)) . 'ResizeStrategy';
-            if (!class_exists($resizeStrategyClassName)) {
-                continue;
-            }
-        }
-
-        if (!isset($resizeStrategyClassName)) {
-            throw new \Exception('Resize mode ' . $mode . ' not supported');
-        }
-
-        /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
-        $resizeStrategy = new $resizeStrategyClassName();
-        if (!($resizeStrategy instanceof \Sokil\Image\AbstractResizeStrategy)) {
-            throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
-        }
-
         $this->loadResource($resizeStrategy->resize($this->_resource, $width, $height));
         
         return $this;
