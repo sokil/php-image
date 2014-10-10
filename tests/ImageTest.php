@@ -7,22 +7,23 @@ use \Sokil\Image\ColorModel\Rgb;
 class ImageTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage File /some-unexisted-file.jpg not found
+     *
+     * @var \Sokil\ImageFactory
      */
-    public function testLoadFile_UnexistedFile()
+    protected $_factory;
+    
+    public function setUp()
     {
-        $image = new Image;
-        $image->loadFile('/some-unexisted-file.jpg');
+        $this->_factory = new \Sokil\ImageFactory;
     }
     
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage File /some-unexisted-file.jpg not found
      */
-    public function testConstrcut_UnexistedFile()
+    public function testLoadFile_UnexistedFile()
     {
-        $image = new Image('/some-unexisted-file.jpg');
+        $this->_factory->openImage('/some-unexisted-file.jpg');
     }
     
     public function testWrite_Jpeg()
@@ -30,7 +31,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $sourceFilename = __DIR__ . '/test.jpg';
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.jpg';
         
-        $image = new Image($sourceFilename);
+        $image = $this->_factory->openImage($sourceFilename);
         $image
             ->write('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $writeStrategy) use($targetFilename) {                
                 $writeStrategy
@@ -53,7 +54,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $sourceFilename = __DIR__ . '/test.gif';
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.gif';
         
-        $image = new Image($sourceFilename);
+        $image = $this->_factory->openImage($sourceFilename);
         $image
             ->write('gif', function(\Sokil\Image\WriteStrategy\GifWriteStrategy $writeStrategy) use($targetFilename) {                
                 $writeStrategy->toFile($targetFilename);
@@ -74,7 +75,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $sourceFilename = __DIR__ . '/test.png';
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.png';
         
-        $image = new Image($sourceFilename);
+        $image = $this->_factory->openImage($sourceFilename);
         $image
             ->write('png', function(\Sokil\Image\WriteStrategy\PngWriteStrategy $writeStrategy) use($targetFilename) {                
                 $writeStrategy
@@ -94,7 +95,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testResize()
     {
-        $image = new Image(__DIR__ . '/test.png');
+        $image = $this->_factory->openImage(__DIR__ . '/test.png');
         $resizedImage = $image->resize('scale', 100, 200);
         
         $this->assertEquals(100, $resizedImage->getWidth());
@@ -103,7 +104,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testRotate()
     {
-        $image = new Image(__DIR__ . '/test.png');
+        $image = $this->_factory->openImage(__DIR__ . '/test.png');
         $resizedImage = $image->rotate(90, '#FF0000');
         
         $this->assertEquals(200, $resizedImage->getWidth());
@@ -112,7 +113,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testFlipVertical()
     {
-        $image = new Image(__DIR__ . '/test.png');
+        $image = $this->_factory->openImage(__DIR__ . '/test.png');
         
         $reflection = new \ReflectionClass($image);
         $method = $reflection->getMethod('_flipVertical');
@@ -128,7 +129,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testFlipHorizontal()
     {
-        $image = new Image(__DIR__ . '/test.png');
+        $image = $this->_factory->openImage(__DIR__ . '/test.png');
         
         $reflection = new \ReflectionClass($image);
         $method = $reflection->getMethod('_flipHorizontal');
@@ -144,7 +145,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testFlipBoth()
     {
-        $image = new Image(__DIR__ . '/test.png');
+        $image = $this->_factory->openImage(__DIR__ . '/test.png');
         
         $reflection = new \ReflectionClass($image);
         $method = $reflection->getMethod('_flipBoth');
@@ -167,7 +168,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testGreyscale()
     {
-        $image = new Image(__DIR__ . '/test.png');
+        $image = $this->_factory->openImage(__DIR__ . '/test.png');
         $greyscaleImage = $image->filter('greyscale');
         
         $color = imagecolorat($greyscaleImage->getResource(), 0, 0);
@@ -178,11 +179,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     }
     
     public function testAppendElement_TextElement()
-    {
-        $factory = new ImageFactory();
-        
+    {        
         // text element
-        $element = $factory
+        $element = $this->_factory
             ->createTextElement()
             ->setText('hello world')
             ->setAngle(20)
@@ -190,7 +189,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
             ->setFont(__DIR__ . '/FreeSerif.ttf');
         
         // place text to image
-        $image = $factory
+        $image = $this->_factory
             ->createImage(300, 300)
             ->fill(Rgb::createWhite())
             // draw shadow
