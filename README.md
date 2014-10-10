@@ -84,17 +84,17 @@ Rotating is counter clockwise;
 
 Rotate on 90 degrees:
 ```php
-$newImage = $image->rotate(90);
+$image->rotate(90);
 ```
 
 Rotate on 45 degrees, and fill empty field with black color:
 ```php
-$newImage = $image->rotate(45, '#000000');
+$image->rotate(45, '#000000');
 ```
 
 Rotate on 45 degrees, and fill empty field with transparent green color:
 ```php
-$newImage = $image->rotate(45, '#8000FF00');
+$image->rotate(45, '#8000FF00');
 ```
 
 Flip image
@@ -102,17 +102,17 @@ Flip image
 
 Flip in vertical direction:
 ```php
-$newImage = $image->flipVertical();
+$image->flipVertical();
 ```
 
 Flip in horisontal direction
 ```php
-$newImage = $image->flipHorisontal();
+$image->flipHorisontal();
 ```
 
 Flip in both directions
 ```php
-$newImage = $image->flipBoth();
+$image->flipBoth();
 ```
 
 Filters
