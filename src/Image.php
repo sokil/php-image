@@ -171,7 +171,7 @@ class Image
     public function flipVertical()
     {
         // use native function
-        if(version_compare(PHP_VERSION, '5.5', '>=')) {
+        if(function_exists('imageflip')) {
             $resource = imageflip($this->_resource, IMG_FLIP_VERTICAL);
         } else {
             $resource = $this->_flipVertical();
@@ -204,7 +204,7 @@ class Image
     public function flipHorizontal()
     {
         // use native function
-        if(version_compare(PHP_VERSION, '5.5', '>=')) {
+        if(function_exists('imageflip')) {
             $resource = imageflip($this->_resource, IMG_FLIP_HORIZONTAL);
         } else {
             $resource = $this->_flipHorizontal();
@@ -237,7 +237,7 @@ class Image
     public function flipBoth()
     {
         // use native function
-        if(version_compare(PHP_VERSION, '5.5', '>=')) {
+        if(function_exists('imageflip')) {
             $resource = imageflip($this->_resource, IMG_FLIP_BOTH);
         } else {
             $resource = $this->_flipBoth();
