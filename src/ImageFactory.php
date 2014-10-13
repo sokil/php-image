@@ -112,14 +112,16 @@ class ImageFactory
     public function resizeImage(Image $image, $mode, $width, $height)
     {
         // save strategy
+        $resizeStrategyClassName = null;
         foreach ($this->_resizeStrategyNamespaces as $namespace) {
             $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($mode)) . 'ResizeStrategy';
             if (!class_exists($resizeStrategyClassName)) {
+                $resizeStrategyClassName = null;
                 continue;
             }
         }
 
-        if (!isset($resizeStrategyClassName)) {
+        if (!$resizeStrategyClassName) {
             throw new \Exception('Resize mode ' . $mode . ' not supported');
         }
 
@@ -137,14 +139,16 @@ class ImageFactory
     public function filterImage(Image $image, $name, $configuratorCallable = null)
     {
         // save strategy
+        $filterStrategyClassName = null;
         foreach ($this->_filterStrategyNamespaces as $namespace) {
             $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
             if (!class_exists($filterStrategyClassName)) {
+                $filterStrategyClassName = null;
                 continue;
             }
         }
 
-        if (!isset($filterStrategyClassName)) {
+        if (!$filterStrategyClassName) {
             throw new \Exception('Filter ' . $name . ' not supported');
         }
 
@@ -170,14 +174,16 @@ class ImageFactory
     public function writeImage(Image $image, $format, $configuratorCallable = null)
     {
         // save strategy
+        $writeStrategyClassName = null;
         foreach ($this->_writeStrategyNamespaces as $namespace) {
             $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
             if (!class_exists($writeStrategyClassName)) {
+                $writeStrategyClassName = null;
                 continue;
             }
         }
 
-        if (!isset($writeStrategyClassName)) {
+        if (!$writeStrategyClassName) {
             throw new \Exception('Format ' . $format . ' not supported');
         }
 
@@ -210,14 +216,16 @@ class ImageFactory
      */
     public function createElement($name)
     {
+        $elementClassName = null;
         foreach($this->_elementNamespaces as $namespace) {
             $elementClassName = $namespace . '\\' . ucfirst(strtolower($name));
             if(!class_exists($elementClassName)) {
+                $elementClassName = null;
                 continue;
             }
         }
         
-        if(!isset($elementClassName)) {
+        if(!$elementClassName) {
             throw new \InvalidArgumentException('Element "' . $elementClassName . '" not exists');
         }
         
