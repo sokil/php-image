@@ -239,7 +239,7 @@ $factory->writeImage($image, 'jpeg', function(\Sokil\Image\WriteStrategy\JpegWri
 });
 
 // through `Image` instance
-$image->writeImage('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $strategy) {
+$image->write('jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $strategy) {
     $strategy->setQuality(98)->toDisk('/path/to/file.jpg');
 });
 ```
