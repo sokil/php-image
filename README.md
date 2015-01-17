@@ -234,7 +234,7 @@ Library supports three formats of image: 'jpeg', 'png' and 'gif'.
 To write image to disk you must define format of image and configure write strategy:
 ```php
 $factory->writeImage($image, 'jpeg', function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $strategy) {
-    $strategy->setQuality(98)->toDisk('/path/to/file.jpg');
+    $strategy->setQuality(98)->toFile('/path/to/file.jpg');
 });
 ```
 
