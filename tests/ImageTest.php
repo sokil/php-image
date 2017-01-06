@@ -128,7 +128,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $method = $reflection->getMethod('flipVertical');
         $method->setAccessible(true);
         
-        $flippedImageResource = $method->invoke();
+        $flippedImageResource = $method->invoke($image);
         
         $this->assertEquals(
             imagecolorat($image->getResource(), 50, 50),
@@ -144,7 +144,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $method = $reflection->getMethod('flipHorizontal');
         $method->setAccessible(true);
         
-        $flippedImageResource = $method->invoke();
+        $flippedImageResource = $method->invoke($image);
         
         $this->assertEquals(
             imagecolorat($image->getResource(), 50, 100),
@@ -160,7 +160,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $method = $reflection->getMethod('flipBoth');
         $method->setAccessible(true);
         
-        $flippedImageResource = $method->invoke();
+        $flippedImageResource = $method->invoke($image);
         
         // vertical
         $this->assertEquals(
