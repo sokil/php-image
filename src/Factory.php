@@ -57,8 +57,12 @@ class Factory
         return new Image($image);
     }
     
-    public function resizeImage(Image $image, $mode, $width, $height)
-    {
+    public function resizeImage(
+        Image $image,
+        $mode,
+        $width,
+        $height
+    ) {
         $resizeStrategyClassName = $this->getResizeStrategyClassNameByResizeMode($mode);
 
         /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
@@ -72,8 +76,11 @@ class Factory
         return $this;
     }
     
-    public function filterImage(Image $image, $name, $configuratorCallable = null)
-    {
+    public function filterImage(
+        Image $image,
+        $name,
+        $configuratorCallable = null
+    ) {
         $filterStrategyClassName = $this->getFilterStrategyClassNameByFilterName($name);
 
         $filterStrategy = new $filterStrategyClassName;
@@ -272,6 +279,6 @@ class Factory
             }
         }
 
-        throw new \InvalidArgumentException('Element "' . $elementClassName . '" not exists');
+        throw new ImageException('Element "' . $elementClassName . '" not exists');
     }
 }
