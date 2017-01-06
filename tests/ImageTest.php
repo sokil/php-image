@@ -119,60 +119,45 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $resizedImage->getWidth());
         $this->assertEquals(300, $resizedImage->getHeight());
     }
-    
-    public function testFlipVertical()
-    {
-        $image = $this->factory->openImage(__DIR__ . '/test.png');
-        
-        $reflection = new \ReflectionClass($image);
-        $method = $reflection->getMethod('flipVertical');
-        $method->setAccessible(true);
-        
-        $flippedImage = $method->invoke($image);
 
-        $this->assertEquals(
-            imagecolorat($image->getResource(), 50, 50),
-            imagecolorat($flippedImage->getResource(), 50, 150)
+    public function flipDataProvider()
+    {
+        return array(
+            'vertical' => array('flipVertical', array(50, 50), array(50, 150)),
+            'horizontal' => array('flipHorizontal', array(50, 100), array(250, 100)),
+            'both_vertical' => array('flipBoth', array(50, 50), array(50, 150)),
+            'both_horizontal' => array('flipBoth', array(50, 100), array(250, 100)),
         );
     }
-    
-    public function testFlipHorizontal()
+
+    /**
+     * @dataProvider flipDataProvider
+     */
+    public function testFlip($methodName, $point, $flippedPoint)
     {
+        // load image
         $image = $this->factory->openImage(__DIR__ . '/test.png');
-        
+
+        // get color
+        $expectedColor = imagecolorsforindex(
+            $image->getResource(),
+            imagecolorat($image->getResource(), $point[0], $point[1])
+        );
+
+        // flip
         $reflection = new \ReflectionClass($image);
-        $method = $reflection->getMethod('flipHorizontal');
+        $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
-        
-        $flippedImage = $method->invoke($image);
-        
-        $this->assertEquals(
-            imagecolorat($image->getResource(), 50, 100),
-            imagecolorat($flippedImage->getResource(), 250, 100)
+        $method->invoke($image);
+
+        // get flipped color
+        $actualColor = imagecolorsforindex(
+            $image->getResource(),
+            imagecolorat($image->getResource(), $flippedPoint[0], $flippedPoint[1])
         );
-    }
-    
-    public function testFlipBoth()
-    {
-        $image = $this->factory->openImage(__DIR__ . '/test.png');
-        
-        $reflection = new \ReflectionClass($image);
-        $method = $reflection->getMethod('flipBoth');
-        $method->setAccessible(true);
-        
-        $flippedImage = $method->invoke($image);
-        
-        // vertical
-        $this->assertEquals(
-            imagecolorat($image->getResource(), 50, 50),
-            imagecolorat($flippedImage->getResource(), 50, 150)
-        );
-        
-        // horizontal
-        $this->assertEquals(
-            imagecolorat($image->getResource(), 50, 100),
-            imagecolorat($flippedImage->getResource(), 250, 100)
-        );
+
+        // check
+        $this->assertEquals($expectedColor, $actualColor);
     }
     
     public function testGreyscale()

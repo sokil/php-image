@@ -275,7 +275,7 @@ class Image
                     );
                 }
             }
-            $this->loadResource($resource);
+            $this->resource = $resource;
         }
         return $this;
     }
@@ -298,7 +298,7 @@ class Image
                     );
                 }
             }
-            $this->loadResource($resource);
+            $this->resource = $resource;
         }
         return $this;
     }
@@ -321,7 +321,7 @@ class Image
                     );
                 }
             }
-            $this->loadResource($resource);
+            $this->resource = $resource;
         }
         return $this;
     }
