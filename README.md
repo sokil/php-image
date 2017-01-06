@@ -22,12 +22,8 @@ Installation
 ------------
 
 You may install library through composer:
-```json
-{
-    "require": {
-        "sokil/php-image": "dev-master"
-    }
-}
+```
+composer require sokil/php-image
 ```
 
 Open image
