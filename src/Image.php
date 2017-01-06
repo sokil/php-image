@@ -35,7 +35,7 @@ class Image
             } elseif (is_resource($image)) {
                 $this->loadResource($image);
             } else {
-                throw new \Exception('Must be image resource or filename, ' . gettype($image) . ' given');
+                throw new ImageException('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
     }
@@ -84,15 +84,21 @@ class Image
 
         switch ($imageInfo[2]) {
             case IMAGETYPE_JPEG:
-                $this->resource = @imagecreatefromjpeg($filename);
+                $resource = \imagecreatefromjpeg($filename);
                 break;
             case IMAGETYPE_PNG:
-                $this->resource = @imagecreatefrompng($filename);
+                $resource = \imagecreatefrompng($filename);
                 break;
             case IMAGETYPE_GIF:
-                $this->resource = @imagecreatefromgif($filename);
+                $resource = \imagecreatefromgif($filename);
                 break;
         }
+
+        if (false === $resource) {
+            throw new ImageException('Can\'t create resource from filename');
+        }
+
+        $this->resource = $resource;
 
         return $this;
     }
@@ -229,7 +235,7 @@ class Image
             : new Rgb(0, 0, 0, 127);
 
         // create color
-        $backgroundColorId = imageColorAllocateAlpha(
+        $backgroundColorId = \imageColorAllocateAlpha(
             $this->resource,
             $backgroundColor->getRed(), 
             $backgroundColor->getGreen(), 
@@ -254,11 +260,11 @@ class Image
     public function flipVertical()
     {
         // use native function
-        if(function_exists('imageflip')) {
-            $resource = imageflip($this->resource, IMG_FLIP_VERTICAL);
+        if (function_exists('imageflip')) {
+            imageflip($this->resource, IMG_FLIP_VERTICAL);
         } else {
             $resource = imagecreatetruecolor($this->width, $this->height);
-            for($x = 0; $x < $this->width; $x++) {
+            for ($x = 0; $x < $this->width; $x++) {
                 for($y = 0; $y < $this->height; $y++) {
                     $color = imagecolorat($this->resource, $x, $y);
                     imagesetpixel(
@@ -269,20 +275,20 @@ class Image
                     );
                 }
             }
+            $this->loadResource($resource);
         }
-        
-        return $this->loadResource($resource);
+        return $this;
     }
 
     public function flipHorizontal()
     {
         // use native function
-        if(function_exists('imageflip')) {
-            $resource = imageflip($this->resource, IMG_FLIP_HORIZONTAL);
+        if (function_exists('imageflip')) {
+            imageflip($this->resource, IMG_FLIP_HORIZONTAL);
         } else {
             $resource = imagecreatetruecolor($this->width, $this->height);
-            for($x = 0; $x < $this->width; $x++) {
-                for($y = 0; $y < $this->height; $y++) {
+            for ($x = 0; $x < $this->width; $x++) {
+                for ($y = 0; $y < $this->height; $y++) {
                     $color = imagecolorat($this->resource, $x, $y);
                     imagesetpixel(
                         $resource,
@@ -292,19 +298,19 @@ class Image
                     );
                 }
             }
+            $this->loadResource($resource);
         }
-        
-        return $this->loadResource($resource);
+        return $this;
     }
 
     public function flipBoth()
     {
         // use native function
-        if(function_exists('imageflip')) {
+        if (function_exists('imageflip')) {
             $resource = imageflip($this->resource, IMG_FLIP_BOTH);
         } else {
             $resource = imagecreatetruecolor($this->width, $this->height);
-            for($x = 0; $x < $this->width; $x++) {
+            for ($x = 0; $x < $this->width; $x++) {
                 for($y = 0; $y < $this->height; $y++) {
                     $color = imagecolorat($this->resource, $x, $y);
                     imagesetpixel(
@@ -315,9 +321,9 @@ class Image
                     );
                 }
             }
+            $this->loadResource($resource);
         }
-        
-        return $this->loadResource($resource);
+        return $this;
     }
 
     /**
