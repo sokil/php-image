@@ -2,7 +2,9 @@
 
 namespace Sokil\Image\WriteStrategy;
 
-class GifWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
+use Sokil\Image\AbstractWriteStrategy;
+
+class GifWriteStrategy extends AbstractWriteStrategy
 {   
     public function write($resource)
     {
@@ -10,7 +12,7 @@ class GifWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
             throw new \Exception('Resource must be given');
         }
         
-        $targetPath = $this->_targetPath;
+        $targetPath = $this->targetPath;
         
         if('gif' !== strtolower(pathinfo($targetPath, PATHINFO_EXTENSION))) {
             $targetPath .= '.gif';

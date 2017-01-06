@@ -129,7 +129,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $method->setAccessible(true);
         
         $flippedImage = $method->invoke($image);
-        
+
         $this->assertEquals(
             imagecolorat($image->getResource(), 50, 50),
             imagecolorat($flippedImage->getResource(), 50, 150)

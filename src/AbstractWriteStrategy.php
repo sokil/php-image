@@ -9,14 +9,14 @@ abstract class AbstractWriteStrategy
      * 
      * @var string|null path to file where to write image
      */
-    protected $_targetPath;
+    protected $targetPath;
 
     /**
      * Write resource to file
      */
     public function toFile($targetPath)
     {
-        $this->_targetPath = $targetPath;
+        $this->targetPath = $targetPath;
         
         return $this;
     }

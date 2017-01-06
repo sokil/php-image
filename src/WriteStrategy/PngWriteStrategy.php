@@ -2,17 +2,19 @@
 
 namespace Sokil\Image\WriteStrategy;
 
-class PngWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
+use Sokil\Image\AbstractWriteStrategy;
+
+class PngWriteStrategy extends AbstractWriteStrategy
 {
-    private $_quality = 9;
+    private $quality = 9;
     
-    private $_filter = PNG_NO_FILTER;
+    private $filter = PNG_NO_FILTER;
     
     public function setQuality($quality)
     {
-        $this->_quality = (int) $quality;
-        if($this->_quality < 0 || $this->_quality > 9) {
-            throw new \Exception('Quality of PNG must be between 0 and 9.');
+        $this->quality = (int) $quality;
+        if ($this->quality < 0 || $this->quality > 9) {
+            throw new ImageException('Quality of PNG must be between 0 and 9.');
         }
         
         return $this;
@@ -20,43 +22,43 @@ class PngWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
     
     public function applyNoneFilter()
     {
-        $this->_filter += PNG_FILTER_NONE;
+        $this->filter += PNG_FILTER_NONE;
         return $this;
     }
     
     public function applySubFilter()
     {
-        $this->_filter += PNG_FILTER_SUB;
+        $this->filter += PNG_FILTER_SUB;
         return $this;
     }
 
     public function applyUpFilter()
     {
-        $this->_filter += PNG_FILTER_UP;
+        $this->filter += PNG_FILTER_UP;
         return $this;
     }
     
     public function applyAvgFilter()
     {
-        $this->_filter += PNG_FILTER_AVG;
+        $this->filter += PNG_FILTER_AVG;
         return $this;
     }
     
     public function applyPaethFilter()
     {
-        $this->_filter += PNG_FILTER_PAETH;
+        $this->filter += PNG_FILTER_PAETH;
         return $this;
     }
     
     public function clearAllFilters()
     {
-        $this->_filter = PNG_NO_FILTER;
+        $this->filter = PNG_NO_FILTER;
         return $this;
     }
     
     public function applyAllFilters()
     {
-        $this->_filter = PNG_ALL_FILTERS;
+        $this->filter = PNG_ALL_FILTERS;
         return $this;
     }
     
@@ -66,13 +68,13 @@ class PngWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
             throw new \Exception('Resource must be given');
         }
         
-        $targetPath = $this->_targetPath;
+        $targetPath = $this->targetPath;
         
         if('png' !== strtolower(pathinfo($targetPath, PATHINFO_EXTENSION))) {
             $targetPath .= '.png';
         }
         
-        if(!imagepng($resource, $targetPath, $this->_quality, $this->_filter)) {
+        if(!imagepng($resource, $targetPath, $this->quality, $this->filter)) {
             throw new \Exception('Error writing PNG file');
         }
     }

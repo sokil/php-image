@@ -2,14 +2,16 @@
 
 namespace Sokil\Image\WriteStrategy;
 
-class JpegWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
+use Sokil\Image\AbstractWriteStrategy;
+
+class JpegWriteStrategy extends AbstractWriteStrategy
 {
-    private $_quality = 100;
+    private $quality = 100;
     
     public function setQuality($quality)
     {
-        $this->_quality = (int) $quality;
-        if($this->_quality < 0 || $this->_quality > 100) {
+        $this->quality = (int) $quality;
+        if($this->quality < 0 || $this->quality > 100) {
             throw new \Exception('Quality of JPEG must be between 0 and 100.');
         }
         
@@ -22,13 +24,13 @@ class JpegWriteStrategy extends \Sokil\Image\AbstractWriteStrategy
             throw new \Exception('Resource must be given');
         }
         
-        $targetPath = $this->_targetPath;
+        $targetPath = $this->targetPath;
         
         if(!in_array(strtolower(pathinfo($targetPath, PATHINFO_EXTENSION)), array('jpg', 'jpeg'))) {
             $targetPath .= '.jpg';
         }
         
-        if(!imagejpeg($resource, $targetPath, $this->_quality)) {
+        if(!imagejpeg($resource, $targetPath, $this->quality)) {
             throw new \Exception('Error writing JPEG file');
         }
     }
