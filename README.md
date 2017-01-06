@@ -29,7 +29,12 @@ composer require sokil/php-image
 Open image
 ----------
 
-Factory incapsulates instantiating of all image objects and aloow to confirure created images:
+Create instance of image:
+```php
+$image = new \Sokil\Image($pathToImage);
+```
+
+Factory incapsulates instantiating of all image objects and allow to confirure created images:
 ```php
 $factory = new \Sokil\ImageFactory;
 ```
