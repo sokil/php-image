@@ -3,18 +3,22 @@
 namespace Sokil;
 
 use \Sokil\Image\ColorModel\Rgb;
+use Sokil\Image\Factory;
+use Sokil\Image\WriteStrategy\GifWriteStrategy;
+use Sokil\Image\WriteStrategy\JpegWriteStrategy;
+use Sokil\Image\WriteStrategy\PngWriteStrategy;
 
 class ImageTest extends \PHPUnit_Framework_TestCase
 {
     /**
      *
-     * @var \Sokil\ImageFactory
+     * @var Factory
      */
-    protected $_factory;
+    protected $factory;
     
     public function setUp()
     {
-        $this->_factory = new \Sokil\ImageFactory;
+        $this->factory = new Factory();
     }
     
     /**
@@ -23,7 +27,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadFile_UnexistedFile()
     {
-        $this->_factory->openImage('/some-unexisted-file.jpg');
+        $this->factory->openImage('/some-unexisted-file.jpg');
     }
     
     public function testWrite_Jpeg()
@@ -31,11 +35,11 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $sourceFilename = __DIR__ . '/test.jpg';
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.jpg';
         
-        $image = $this->_factory->openImage($sourceFilename);
-        $this->_factory->writeImage(
+        $image = $this->factory->openImage($sourceFilename);
+        $this->factory->writeImage(
             $image, 
             'jpeg', 
-            function(\Sokil\Image\WriteStrategy\JpegWriteStrategy $writeStrategy) use($targetFilename) {                
+            function(JpegWriteStrategy $writeStrategy) use($targetFilename) {
                 $writeStrategy->setQuality(100)->toFile($targetFilename);
             }
         );
@@ -55,11 +59,11 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $sourceFilename = __DIR__ . '/test.gif';
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.gif';
         
-        $image = $this->_factory->openImage($sourceFilename);
-        $this->_factory->writeImage(
+        $image = $this->factory->openImage($sourceFilename);
+        $this->factory->writeImage(
             $image,
             'gif', 
-            function(\Sokil\Image\WriteStrategy\GifWriteStrategy $writeStrategy) use($targetFilename) {                
+            function(GifWriteStrategy $writeStrategy) use($targetFilename) {
                 $writeStrategy->toFile($targetFilename);
             }
         );
@@ -79,11 +83,11 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $sourceFilename = __DIR__ . '/test.png';
         $targetFilename = sys_get_temp_dir() . '/sokil-php-image.png';
         
-        $image = $this->_factory->openImage($sourceFilename);
-        $this->_factory->writeImage(
+        $image = $this->factory->openImage($sourceFilename);
+        $this->factory->writeImage(
             $image,
             'png', 
-            function(\Sokil\Image\WriteStrategy\PngWriteStrategy $writeStrategy) use($targetFilename) {                
+            function(PngWriteStrategy $writeStrategy) use($targetFilename) {
                 $writeStrategy->setQuality(9)->toFile($targetFilename);
             }
         );
@@ -100,8 +104,8 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testResize()
     {
-        $image = $this->_factory->openImage(__DIR__ . '/test.png');
-        $this->_factory->resizeImage($image, 'scale', 100, 200);
+        $image = $this->factory->openImage(__DIR__ . '/test.png');
+        $this->factory->resizeImage($image, 'scale', 100, 200);
         
         $this->assertEquals(100, $image->getWidth());
         $this->assertEquals(66, $image->getHeight());
@@ -109,7 +113,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testRotate()
     {
-        $image = $this->_factory->openImage(__DIR__ . '/test.png');
+        $image = $this->factory->openImage(__DIR__ . '/test.png');
         $resizedImage = $image->rotate(90, '#FF0000');
         
         $this->assertEquals(200, $resizedImage->getWidth());
@@ -118,10 +122,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testFlipVertical()
     {
-        $image = $this->_factory->openImage(__DIR__ . '/test.png');
+        $image = $this->factory->openImage(__DIR__ . '/test.png');
         
         $reflection = new \ReflectionClass($image);
-        $method = $reflection->getMethod('_flipVertical');
+        $method = $reflection->getMethod('flipVertical');
         $method->setAccessible(true);
         
         $flippedImageResource = $method->invoke($image);
@@ -134,10 +138,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testFlipHorizontal()
     {
-        $image = $this->_factory->openImage(__DIR__ . '/test.png');
+        $image = $this->factory->openImage(__DIR__ . '/test.png');
         
         $reflection = new \ReflectionClass($image);
-        $method = $reflection->getMethod('_flipHorizontal');
+        $method = $reflection->getMethod('flipHorizontal');
         $method->setAccessible(true);
         
         $flippedImageResource = $method->invoke($image);
@@ -150,10 +154,10 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testFlipBoth()
     {
-        $image = $this->_factory->openImage(__DIR__ . '/test.png');
+        $image = $this->factory->openImage(__DIR__ . '/test.png');
         
         $reflection = new \ReflectionClass($image);
-        $method = $reflection->getMethod('_flipBoth');
+        $method = $reflection->getMethod('flipBoth');
         $method->setAccessible(true);
         
         $flippedImageResource = $method->invoke($image);
@@ -173,8 +177,8 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testGreyscale()
     {
-        $image = $this->_factory->openImage(__DIR__ . '/test.png');
-        $this->_factory->filterImage($image, 'greyscale');
+        $image = $this->factory->openImage(__DIR__ . '/test.png');
+        $this->factory->filterImage($image, 'greyscale');
         
         $color = imagecolorat($image->getResource(), 0, 0);
         $this->assertEquals(array(29, 29, 29), Rgb::fromIntAsArray($color));
@@ -186,7 +190,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testAppendElement_TextElement()
     {        
         // text element
-        $element = $this->_factory
+        $element = $this->factory
             ->createTextElement()
             ->setText('hello world')
             ->setAngle(20)
@@ -194,7 +198,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
             ->setFont(__DIR__ . '/FreeSerif.ttf');
         
         // place text to image
-        $image = $this->_factory
+        $image = $this->factory
             ->createImage(300, 300)
             ->fill(Rgb::createWhite())
             // draw shadow
@@ -210,11 +214,14 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     
     public function testCrop()
     {
-        $image = $this->_factory->openImage(__DIR__ . '/test.png');
+        $image = $this->factory->openImage(__DIR__ . '/test.png');
         $image->crop(10, 10, 10, 10);
         
         $this->assertEquals(10, imagesx($image->getResource()));
         $this->assertEquals(10, imagesy($image->getResource()));
-        $this->assertEquals(array(0, 0, 255, 0), Rgb::fromInt(imagecolorat($image->getResource(), 5, 5))->toArray());
+        $this->assertEquals(
+            array(0, 0, 255, 0),
+            Rgb::fromInt(imagecolorat($image->getResource(), 5, 5))->toArray()
+        );
     }
 }
