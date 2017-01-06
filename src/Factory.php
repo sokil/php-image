@@ -33,70 +33,6 @@ class Factory
         }
     }
     
-    public function addWriteStrategyNamespace($namespace)
-    {
-        $this->writeStrategyNamespaces[] = rtrim($namespace, '\\');
-        return $this;
-    }
-    
-    public function addWriteStrategyNamespaces(array $namespaces)
-    {
-        array_map(array($this, 'addWriteStrategyNamespace'), $namespaces);
-        return $this;
-    }
-
-    public function addResizeStrategyNamespace($namespace)
-    {
-        $this->resizeStrategyNamespaces[] = rtrim($namespace, '\\');
-    }
-    
-    public function addResizeStrategyNamespaces(array $namespaces)
-    {
-        array_map(array($this, 'addResizeStrategyNamespace'), $namespaces);
-        return $this;
-    }
-    
-    public function addFilterStrategyNamespace($namespace)
-    {
-        $this->filterStrategyNamespaces[] = rtrim($namespace, '\\');
-    }
-    
-    public function addFilterStrategyNamespaces(array $namespaces)
-    {
-        array_map(array($this, 'addFilterStrategyNamespace'), $namespaces);
-        return $this;
-    }
-
-    public function addElementNamespace($namespace)
-    {
-        $this->elementNamespaces[] = rtrim($namespace, '\\');
-    }
-    
-    public function addElementNamespaces(array $namespaces)
-    {
-        array_map(array($this, 'addElementNamespace'), $namespaces);
-        return $this;
-    }
-
-    public function configureNamespaces(array $namespaces)
-    {
-        if (isset($namespaces['write'])) {
-            $this->addWriteStrategyNamespaces($namespaces['write']);
-        }
-
-        if (isset($namespaces['resize'])) {
-            $this->addResizeStrategyNamespaces($namespaces['resize']);
-        }
-
-        if (isset($namespaces['filter'])) {
-            $this->addFilterStrategyNamespaces($namespaces['write']);
-        }
-
-        if (isset($namespaces['element'])) {
-            $this->addElementNamespaces($namespaces['element']);
-        }
-    }
-    
     /**
      * Create empty image
      * @param int $width
@@ -113,25 +49,12 @@ class Factory
      * Open existed image
      *
      * @param string|resource $image path to file on disk or image resource
-     * 
+     *
      * @return Image
      */
     public function openImage($image)
     {
         return new Image($image);
-    }
-    
-    private function getResizeStrategyClassNameByResizeMode($resizeMode)
-    {
-        // save strategy
-        foreach ($this->resizeStrategyNamespaces as $namespace) {
-            $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($resizeMode)) . 'ResizeStrategy';
-            if (class_exists($resizeStrategyClassName)) {
-                return $resizeStrategyClassName;
-            }
-        }
-
-        throw new ImageException('Resize mode ' . $resizeMode . ' not supported');
     }
     
     public function resizeImage(Image $image, $mode, $width, $height)
@@ -147,19 +70,6 @@ class Factory
         $image->resize($resizeStrategy, $width, $height);
         
         return $this;
-    }
-    
-    private function getFilterStrategyClassNameByFilterName($name)
-    {
-        // save strategy
-        foreach ($this->filterStrategyNamespaces as $namespace) {
-            $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
-            if (class_exists($filterStrategyClassName)) {
-                return $filterStrategyClassName;
-            }
-        }
-
-        throw new ImageException('Filter ' . $name . ' not supported');
     }
     
     public function filterImage(Image $image, $name, $configuratorCallable = null)
@@ -180,19 +90,7 @@ class Factory
         
         return $this;
     }
-    
-    private function getWriteStrategyClassNameByWriteFormat($format)
-    {
-        // save strategy
-        foreach ($this->writeStrategyNamespaces as $namespace) {
-            $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
-            if (class_exists($writeStrategyClassName)) {
-                return $writeStrategyClassName;
-            }
-        }
-        
-        throw new ImageException('Format ' . $format . ' not supported');
-    }
+
     /**
      * Write image to file
      *
@@ -230,18 +128,6 @@ class Factory
         return $this;
     }
     
-    private function getElementClassNameByElementName($name)
-    {
-        foreach($this->elementNamespaces as $namespace) {
-            $elementClassName = $namespace . '\\' . ucfirst(strtolower($name));
-            if(class_exists($elementClassName)) {
-                return $elementClassName;
-            }
-        }
-        
-        throw new \InvalidArgumentException('Element "' . $elementClassName . '" not exists');
-    }
-    
     /**
      * Create element
      * 
@@ -272,5 +158,120 @@ class Factory
     public function createTextElement()
     {
         return $this->createElement('text');
+    }
+
+    public function addWriteStrategyNamespace($namespace)
+    {
+        $this->writeStrategyNamespaces[] = rtrim($namespace, '\\');
+        return $this;
+    }
+
+    public function addWriteStrategyNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addWriteStrategyNamespace'), $namespaces);
+        return $this;
+    }
+
+    public function addResizeStrategyNamespace($namespace)
+    {
+        $this->resizeStrategyNamespaces[] = rtrim($namespace, '\\');
+    }
+
+    public function addResizeStrategyNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addResizeStrategyNamespace'), $namespaces);
+        return $this;
+    }
+
+    public function addFilterStrategyNamespace($namespace)
+    {
+        $this->filterStrategyNamespaces[] = rtrim($namespace, '\\');
+    }
+
+    public function addFilterStrategyNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addFilterStrategyNamespace'), $namespaces);
+        return $this;
+    }
+
+    public function addElementNamespace($namespace)
+    {
+        $this->elementNamespaces[] = rtrim($namespace, '\\');
+    }
+
+    public function addElementNamespaces(array $namespaces)
+    {
+        array_map(array($this, 'addElementNamespace'), $namespaces);
+        return $this;
+    }
+
+    public function configureNamespaces(array $namespaces)
+    {
+        if (isset($namespaces['write'])) {
+            $this->addWriteStrategyNamespaces($namespaces['write']);
+        }
+
+        if (isset($namespaces['resize'])) {
+            $this->addResizeStrategyNamespaces($namespaces['resize']);
+        }
+
+        if (isset($namespaces['filter'])) {
+            $this->addFilterStrategyNamespaces($namespaces['write']);
+        }
+
+        if (isset($namespaces['element'])) {
+            $this->addElementNamespaces($namespaces['element']);
+        }
+    }
+
+    private function getResizeStrategyClassNameByResizeMode($resizeMode)
+    {
+        // save strategy
+        foreach ($this->resizeStrategyNamespaces as $namespace) {
+            $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($resizeMode)) . 'ResizeStrategy';
+            if (class_exists($resizeStrategyClassName)) {
+                return $resizeStrategyClassName;
+            }
+        }
+
+        throw new ImageException('Resize mode ' . $resizeMode . ' not supported');
+    }
+
+    private function getFilterStrategyClassNameByFilterName($name)
+    {
+        // save strategy
+        foreach ($this->filterStrategyNamespaces as $namespace) {
+            $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
+            if (class_exists($filterStrategyClassName)) {
+                return $filterStrategyClassName;
+            }
+        }
+
+        throw new ImageException('Filter ' . $name . ' not supported');
+    }
+
+    private function getWriteStrategyClassNameByWriteFormat($format)
+    {
+        // save strategy
+        foreach ($this->writeStrategyNamespaces as $namespace) {
+            $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
+            if (class_exists($writeStrategyClassName)) {
+                return $writeStrategyClassName;
+            }
+        }
+
+        throw new ImageException('Format ' . $format . ' not supported');
+    }
+
+    private function getElementClassNameByElementName($name)
+    {
+        foreach($this->elementNamespaces as $namespace) {
+            $elementClassName = $namespace . '\\' . ucfirst(strtolower($name));
+            if(class_exists($elementClassName)) {
+                return $elementClassName;
+            }
+        }
+
+        throw new \InvalidArgumentException('Element "' . $elementClassName . '" not exists');
     }
 }
