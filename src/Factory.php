@@ -82,7 +82,7 @@ class Factory
         }
 
         // configure strategy
-        if($configuratorCallable) {
+        if ($configuratorCallable) {
             call_user_func($configuratorCallable, $filterStrategy);
         }
         
@@ -115,8 +115,8 @@ class Factory
         }
         
         // configure 
-        if($configuratorCallable) {
-            if(!is_callable($configuratorCallable)) {
+        if ($configuratorCallable) {
+            if (!is_callable($configuratorCallable)) {
                 throw new ImageException('Wrong configurator specified');
             }
 
