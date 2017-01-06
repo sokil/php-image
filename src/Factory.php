@@ -101,7 +101,7 @@ class Factory
      * Create empty image
      * @param int $width
      * @param int $height
-     * @return \Sokil\Image
+     * @return Image
      */
     public function createImage($width, $height)
     {
@@ -111,8 +111,10 @@ class Factory
     
     /**
      * Open existed image
+     *
      * @param string|resource $image path to file on disk or image resource
-     * @return \Sokil\Image
+     * 
+     * @return Image
      */
     public function openImage($image)
     {
@@ -129,7 +131,7 @@ class Factory
             }
         }
 
-        throw new \Exception('Resize mode ' . $resizeMode . ' not supported');
+        throw new ImageException('Resize mode ' . $resizeMode . ' not supported');
     }
     
     public function resizeImage(Image $image, $mode, $width, $height)
@@ -139,7 +141,7 @@ class Factory
         /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
         $resizeStrategy = new $resizeStrategyClassName();
         if (!($resizeStrategy instanceof AbstractResizeStrategy)) {
-            throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
+            throw new ImageException('Resize strategy must extend AbstractResizeStrategy');
         }
 
         $image->resize($resizeStrategy, $width, $height);
@@ -157,7 +159,7 @@ class Factory
             }
         }
 
-        throw new \Exception('Filter ' . $name . ' not supported');
+        throw new ImageException('Filter ' . $name . ' not supported');
     }
     
     public function filterImage(Image $image, $name, $configuratorCallable = null)
@@ -166,7 +168,7 @@ class Factory
 
         $filterStrategy = new $filterStrategyClassName;
         if (!($filterStrategy instanceof AbstractFilterStrategy)) {
-            throw new \Exception('Filter strategy must extend AbstractFilterStrategy');
+            throw new ImageException('Filter strategy must extend AbstractFilterStrategy');
         }
 
         // configure strategy
@@ -189,7 +191,7 @@ class Factory
             }
         }
         
-        throw new \Exception('Format ' . $format . ' not supported');
+        throw new ImageException('Format ' . $format . ' not supported');
     }
     /**
      * Write image to file
@@ -198,7 +200,7 @@ class Factory
      * @param string $format
      * @param callable $configuratorCallable
      *
-     * @return ImageFactory
+     * @return $this
      *
      * @throws ImageException
      */
@@ -255,7 +257,7 @@ class Factory
         
         $element = new $elementClassName;
 
-        if(!($element instanceof AbstractElement)) {
+        if (!($element instanceof AbstractElement)) {
             throw new ImageException('Element must implement AbstractElement class');
         }
 
@@ -263,7 +265,8 @@ class Factory
     }
     
     /**
-     * 
+     * Create text element
+     *
      * @return \Sokil\Image\Element\Text
      */
     public function createTextElement()
