@@ -36,19 +36,20 @@ class Rgb
     /**
      * Get Rgb color from any source
      * 
-     * @param int|string|array $color
-     * @return \sSokil\Image\ColorModel\Rgb
+     * @param int|string|array|Rgb $color
+     * @return Rgb
+     *
      * @throws \InvalidArgumentException
      */
     public static function normalize($color)
     {
         // already Rgb
-        if($color instanceof self) {
+        if ($color instanceof self) {
             return $color;
         }
         
         // int
-        if(is_int($color)) {
+        if (is_int($color)) {
             return self::fromInt($color);
         }
         
@@ -62,6 +63,7 @@ class Rgb
             if (count($color) < 3 || count($color) > 4) {
                 throw new \InvalidArgumentException('Wrong color specified');
             }
+
             // check is alpha specified
             if (!isset($color[4])) {
                 $color[4] = 127;

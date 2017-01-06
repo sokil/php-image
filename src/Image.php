@@ -2,16 +2,29 @@
 
 namespace Sokil;
 
+use Sokil\Image\AbstractFilterStrategy;
+use Sokil\Image\AbstractResizeStrategy;
+use Sokil\Image\AbstractWriteStrategy;
 use Sokil\Image\ColorModel\Rgb;
 use Sokil\Image\AbstractElement;
+use Sokil\Image\Exception\ImageException;
 
 class Image
 {
-    private $_resource;
-    
-    private $_width;
-    
-    private $_height;
+    /**
+     * @var resource
+     */
+    private $resource;
+
+    /**
+     * @var int
+     */
+    private $width;
+
+    /**
+     * @var int
+     */
+    private $height;
 
     public function __construct($image = null)
     {
@@ -26,90 +39,133 @@ class Image
             }
         }
     }
-    
+
+    /**
+     * Create empty image with defined width and height
+     *
+     * @param int $width
+     * @param int $height
+     * @return Image
+     */
     public function create($width, $height)
     {
         return $this->loadResource(imagecreatetruecolor($width, $height));
     }
 
+    /**
+     * Create image from file
+     *
+     * @param $filename
+     * @return $this
+     * @throws \Exception
+     */
     public function loadFile($filename)
     {
         if (!file_exists($filename)) {
-            throw new \Exception('File ' . $filename . ' not found');
+            throw new ImageException('File ' . $filename . ' not found');
         }
 
         if (!is_readable($filename)) {
-            throw new \Exception('File ' . $filename . ' not readable');
+            throw new ImageException('File ' . $filename . ' not readable');
         }
 
         $imageInfo = @getimagesize($filename);
         if (!$imageInfo) {
-            throw new \Exception('Wrong image format');
+            throw new ImageException('Wrong image format');
         }
 
         if (!in_array($imageInfo[2], array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF))) {
             throw new \Exception('Only image of JPEG, PNG and GIF formats supported');
         }
 
-        $this->_width = $imageInfo[0];
+        $this->width = $imageInfo[0];
 
-        $this->_height = $imageInfo[1];
+        $this->height = $imageInfo[1];
 
         switch ($imageInfo[2]) {
             case IMAGETYPE_JPEG:
-                $this->_resource = @imagecreatefromjpeg($filename);
+                $this->resource = @imagecreatefromjpeg($filename);
                 break;
             case IMAGETYPE_PNG:
-                $this->_resource = @imagecreatefrompng($filename);
+                $this->resource = @imagecreatefrompng($filename);
                 break;
             case IMAGETYPE_GIF:
-                $this->_resource = @imagecreatefromgif($filename);
+                $this->resource = @imagecreatefromgif($filename);
                 break;
         }
 
         return $this;
     }
 
+    /**
+     * Create file from resource
+     *
+     * @param resource $resource
+     * @return $this
+     *
+     * @throws \Exception
+     */
     public function loadResource($resource)
     {
         if (!(is_resource($resource) && 'gd' === get_resource_type($resource))) {
             throw new \Exception('Must be resource of type "gd", ' . gettype($resource) . ' given');
         }
 
-        $this->_resource = $resource;
-
-        $this->_width = imagesx($resource);
-
-        $this->_height = imagesy($resource);
+        $this->resource = $resource;
+        $this->width = imagesx($resource);
+        $this->height = imagesy($resource);
 
         return $this;
     }
-    
+
+    /**
+     * Get image resource
+     *
+     * @return resource
+     */
     public function getResource()
     {
-        return $this->_resource;
+        return $this->resource;
     }
 
+    /**
+     * Get width
+     *
+     * @return int
+     */
     public function getWidth()
     {
-        return $this->_width;
+        return $this->width;
     }
 
+    /**
+     * Get height
+     *
+     * @return int
+     */
     public function getHeight()
     {
-        return $this->_height;
+        return $this->height;
     }
-    
+
+    /**
+     * Fill image with color
+     *
+     * @param int|string|array|Rgb $color
+     * @param int $x
+     * @param int $y
+     * @return $this
+     */
     public function fill($color, $x = 0, $y = 0)
     {
         $color = Rgb::normalize($color);
         
         imagefill(
-            $this->_resource, 
+            $this->resource,
             $x, 
             $y, 
             imagecolorallocatealpha(
-                $this->_resource, 
+                $this->resource,
                 $color->getRed(), 
                 $color->getGreen(), 
                 $color->getBlue(), 
@@ -120,37 +176,61 @@ class Image
         return $this;
     }
 
-    public function resize(\Sokil\Image\AbstractResizeStrategy $resizeStrategy, $width, $height)
+    /**
+     * Resize image
+     *
+     * @param AbstractResizeStrategy $resizeStrategy
+     * @param int $width
+     * @param int $height
+     *
+     * @return $this
+     */
+    public function resize(
+        AbstractResizeStrategy $resizeStrategy,
+        $width,
+        $height
+    ) {
+        return $this->loadResource(
+            $resizeStrategy->resize(
+                $this->resource,
+                $width,
+                $height
+            )
+        );
+    }
+
+    /**
+     * Write image to file
+     *
+     * @param AbstractWriteStrategy $writeStrategy
+     *
+     * @return AbstractWriteStrategy
+     */
+    public function write(AbstractWriteStrategy $writeStrategy)
     {
-        $this->loadResource($resizeStrategy->resize($this->_resource, $width, $height));
-        
+        $writeStrategy->write($this->resource);
         return $this;
     }
 
     /**
-     * @return \Sokil\Image\AbstractWriteStrategy
+     * Rotate image
+     *
+     * @param float $angle
+     * @param int|string|array|Rgb $backgroundColor
+     *
+     * @return $this
      */
-    public function write(\Sokil\Image\AbstractWriteStrategy $writeStrategy)
-    {
-        $writeStrategy->write($this->_resource);
-        
-        return $this;
-    }
-
-    /**
-     * 
-     * @param type $angle
-     * @param array $backgroundColor
-     */
-    public function rotate($angle, $backgroundColor = null)
-    {
+    public function rotate(
+        $angle,
+        $backgroundColor = null
+    ) {
         $backgroundColor = $backgroundColor 
             ? Rgb::normalize($backgroundColor)
             : new Rgb(0, 0, 0, 127);
 
         // create color
         $backgroundColorId = imageColorAllocateAlpha(
-            $this->_resource, 
+            $this->resource,
             $backgroundColor->getRed(), 
             $backgroundColor->getGreen(), 
             $backgroundColor->getBlue(), 
@@ -158,128 +238,118 @@ class Image
         );
 
         // rotate image
-        $rotatedImageResource = imagerotate($this->_resource, $angle, $backgroundColorId, true);
+        $rotatedImageResource = imagerotate($this->resource, $angle, $backgroundColorId, true);
 
         imagealphablending($rotatedImageResource, false);
         imagesavealpha($rotatedImageResource, true);
 
-        $this->loadResource($rotatedImageResource);
-        
-        return $this;
+        return $this->loadResource($rotatedImageResource);
     }
 
+    /**
+     * Flip image
+     *
+     * @return $this
+     */
     public function flipVertical()
     {
         // use native function
         if(function_exists('imageflip')) {
-            $resource = imageflip($this->_resource, IMG_FLIP_VERTICAL);
+            $resource = imageflip($this->resource, IMG_FLIP_VERTICAL);
         } else {
-            $resource = $this->_flipVertical();
-        }
-        
-        $this->loadResource($resource);
-
-        return $this;
-    }
-    
-    private function _flipVertical()
-    {
-        $flippedImageResource = imagecreatetruecolor($this->_width, $this->_height);
-        
-        for($x = 0; $x < $this->_width; $x++) {
-            for($y = 0; $y < $this->_height; $y++) {
-                $color = imagecolorat($this->_resource, $x, $y);
-                imagesetpixel(
-                    $flippedImageResource, 
-                    $x, 
-                    $this->_height - 1 - $y, 
-                    $color
-                );
+            $resource = imagecreatetruecolor($this->width, $this->height);
+            for($x = 0; $x < $this->width; $x++) {
+                for($y = 0; $y < $this->height; $y++) {
+                    $color = imagecolorat($this->resource, $x, $y);
+                    imagesetpixel(
+                        $resource,
+                        $x,
+                        $this->height - 1 - $y,
+                        $color
+                    );
+                }
             }
         }
         
-        return $flippedImageResource;
+        return $this->loadResource($resource);
     }
 
     public function flipHorizontal()
     {
         // use native function
         if(function_exists('imageflip')) {
-            $resource = imageflip($this->_resource, IMG_FLIP_HORIZONTAL);
+            $resource = imageflip($this->resource, IMG_FLIP_HORIZONTAL);
         } else {
-            $resource = $this->_flipHorizontal();
-        }
-        
-        $this->loadResource($resource);
-
-        return $this;
-    }
-    
-    private function _flipHorizontal()
-    {
-        $flippedImageResource = imagecreatetruecolor($this->_width, $this->_height);
-        
-        for($x = 0; $x < $this->_width; $x++) {
-            for($y = 0; $y < $this->_height; $y++) {
-                $color = imagecolorat($this->_resource, $x, $y);
-                imagesetpixel(
-                    $flippedImageResource, 
-                    $this->_width - 1 - $x, 
-                    $y, 
-                    $color
-                );
+            $resource = imagecreatetruecolor($this->width, $this->height);
+            for($x = 0; $x < $this->width; $x++) {
+                for($y = 0; $y < $this->height; $y++) {
+                    $color = imagecolorat($this->resource, $x, $y);
+                    imagesetpixel(
+                        $resource,
+                        $this->width - 1 - $x,
+                        $y,
+                        $color
+                    );
+                }
             }
         }
         
-        return $flippedImageResource;
+        return $this->loadResource($resource);
     }
 
     public function flipBoth()
     {
         // use native function
         if(function_exists('imageflip')) {
-            $resource = imageflip($this->_resource, IMG_FLIP_BOTH);
+            $resource = imageflip($this->resource, IMG_FLIP_BOTH);
         } else {
-            $resource = $this->_flipBoth();
-        }
-        
-        $this->loadResource($resource);
-
-        return $this;
-    }
-    
-    private function _flipBoth()
-    {
-        $flippedImageResource = imagecreatetruecolor($this->_width, $this->_height);
-        
-        for($x = 0; $x < $this->_width; $x++) {
-            for($y = 0; $y < $this->_height; $y++) {
-                $color = imagecolorat($this->_resource, $x, $y);
-                imagesetpixel(
-                    $flippedImageResource, 
-                    $this->_width - 1 - $x, 
-                    $this->_height - 1 - $y, 
-                    $color
-                );
+            $resource = imagecreatetruecolor($this->width, $this->height);
+            for($x = 0; $x < $this->width; $x++) {
+                for($y = 0; $y < $this->height; $y++) {
+                    $color = imagecolorat($this->resource, $x, $y);
+                    imagesetpixel(
+                        $resource,
+                        $this->width - 1 - $x,
+                        $this->height - 1 - $y,
+                        $color
+                    );
+                }
             }
         }
         
-        return $flippedImageResource;
+        return $this->loadResource($resource);
     }
-    
-    public function filter(\Sokil\Image\AbstractFilterStrategy $filterStrategy)
+
+    /**
+     * Apply filter to image
+     *
+     * @param AbstractFilterStrategy $filterStrategy
+     *
+     * @return $this
+     */
+    public function filter(AbstractFilterStrategy $filterStrategy)
     {
-        $this->loadResource($filterStrategy->filter($this->_resource));
+        $this->loadResource($filterStrategy->filter($this->resource));
         
         return $this;
     }
-    
+
+    /**
+     * Crop image
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     *
+     * @return $this
+     */
     public function crop($x, $y, $width, $height)
     {
         $croppedImageResource = imagecreatetruecolor($width, $height);
         imagecopyresampled(
             $croppedImageResource, 
-            $this->_resource, 
+            $this->resource,
             0, 
             0, 
             $x, 
@@ -292,11 +362,19 @@ class Image
         
         $this->loadResource($croppedImageResource);
     }
-    
+
+    /**
+     * Add element to specified position
+     *
+     * @param AbstractElement $element
+     * @param int $x
+     * @param int $y
+     *
+     * @return $this
+     */
     public function appendElementAtPosition(AbstractElement $element, $x, $y)
     {
-        $element->draw($this->_resource, $x, $y);
-        
+        $element->draw($this->resource, $x, $y);
         return $this;
     }
 }
