@@ -31,12 +31,12 @@ Open image
 
 Create instance of image:
 ```php
-$image = new \Sokil\Image($pathToImage);
+$image = new \Sokil\Image\Image($pathToImage);
 ```
 
 Factory incapsulates instantiating of all image objects and allow to confirure created images:
 ```php
-$factory = new \Sokil\ImageFactory;
+$factory = new \Sokil\Image\Factory;
 ```
 
 Opening from filename:
@@ -68,7 +68,7 @@ $newImage = $factory->resizeImage($image, $mode, $width, $height);
 If you want to register own resize strategy, extend class from \Sokil\Image\AbstractResizeStrategy and add namespase:
 ```php
 // through factory constructor
-$factory = new \Sokil\ImageFactory([
+$factory = new \Sokil\Image\Factory([
     'namespace' => [
         'resize' => '\Vendor\ResizeStrategy',
     ],
@@ -142,7 +142,7 @@ $factory->filterImage($image, 'greyscale');
 If you want to register own filter strategy to support new filters, extend class from \Sokil\Image\AbstractFilterStrategy and add namespase:
 ```php
 // through factory constructor
-$factory = new \Sokil\ImageFactory([
+$factory = new \Sokil\Image\Factory([
     'namespace' => [
         'filter' => '\Vendor\FilterStrategy',
     ],
@@ -184,7 +184,7 @@ class Circle extends \Sokil\Image\AbstractElement
 }
 
 // through factory constructor
-$factory = new \Sokil\ImageFactory([
+$factory = new \Sokil\Image\Factory([
     'namespace' => [
         'element' => '\Vendor\Element',
     ],
@@ -210,7 +210,7 @@ $textElement = $factory->createTextElement();
 
 First we need to configure text element:
 ```php
-$factory = new ImageFactory();
+$factory = new \Sokil\Image\Factory();
         
 // text element
 $element = $factory
@@ -249,7 +249,7 @@ $factory->writeImage($image, 'jpeg', function(\Sokil\Image\WriteStrategy\JpegWri
 If you want to register own write strategy to support new image format, extend class from \Sokil\Image\AbstractWriteStrategy and add namespase:
 ```php
 // through factory constructor
-$factory = new \Sokil\ImageFactory([
+$factory = new \Sokil\Image\Factory([
     'namespace' => [
         'write' => '\Vendor\WriteStrategy',
     ],

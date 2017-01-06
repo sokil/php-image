@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil;
+namespace Sokil\Image;
 
 use Sokil\Image\AbstractFilterStrategy;
 use Sokil\Image\AbstractResizeStrategy;

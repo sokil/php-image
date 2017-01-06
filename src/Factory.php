@@ -1,50 +1,41 @@
 <?php
 
-namespace Sokil;
+namespace Sokil\Image;
 
-class ImageFactory
+use Sokil\Image\AbstractElement;
+use Sokil\Image\AbstractFilterStrategy;
+use Sokil\Image\AbstractResizeStrategy;
+use Sokil\Image\AbstractWriteStrategy;
+use Sokil\Image\Exception\ImageException;
+
+class Factory
 {
-    private $_writeStrategyNamespaces = array(
+    private $writeStrategyNamespaces = array(
         '\Sokil\Image\WriteStrategy',
     );
     
-    private $_resizeStrategyNamespaces = array(
+    private $resizeStrategyNamespaces = array(
         '\Sokil\Image\ResizeStrategy',
     );
     
-    private $_filterStrategyNamespaces = array(
+    private $filterStrategyNamespaces = array(
         '\Sokil\Image\FilterStrategy',
     );
     
-    private $_elementNamespaces = array(
+    private $elementNamespaces = array(
         '\Sokil\Image\Element',
     );
     
     public function __construct(array $options = array())
     {
         if(isset($options['namespace'])) {
-            
-            if(isset($options['namespace']['write'])) {
-                $this->addWriteStrategyNamespaces($options['namespace']['write']);
-            }
-            
-            if(isset($options['namespace']['resize'])) {
-                $this->addResizeStrategyNamespaces($options['namespace']['resize']);
-            }
-            
-            if(isset($options['namespace']['filter'])) {
-                $this->addFilterStrategyNamespaces($options['namespace']['write']);
-            }
-            
-            if(isset($options['namespace']['element'])) {
-                $this->addElementNamespaces($options['namespace']['element']);
-            }
+            $this->configureNamespaces($options['namespace']);
         }
     }
     
     public function addWriteStrategyNamespace($namespace)
     {
-        $this->_writeStrategyNamespaces[] = rtrim($namespace, '\\');
+        $this->writeStrategyNamespaces[] = rtrim($namespace, '\\');
         return $this;
     }
     
@@ -56,7 +47,7 @@ class ImageFactory
 
     public function addResizeStrategyNamespace($namespace)
     {
-        $this->_resizeStrategyNamespaces[] = rtrim($namespace, '\\');
+        $this->resizeStrategyNamespaces[] = rtrim($namespace, '\\');
     }
     
     public function addResizeStrategyNamespaces(array $namespaces)
@@ -67,7 +58,7 @@ class ImageFactory
     
     public function addFilterStrategyNamespace($namespace)
     {
-        $this->_filterStrategyNamespaces[] = rtrim($namespace, '\\');
+        $this->filterStrategyNamespaces[] = rtrim($namespace, '\\');
     }
     
     public function addFilterStrategyNamespaces(array $namespaces)
@@ -78,13 +69,32 @@ class ImageFactory
 
     public function addElementNamespace($namespace)
     {
-        $this->_elementNamespaces[] = rtrim($namespace, '\\');
+        $this->elementNamespaces[] = rtrim($namespace, '\\');
     }
     
     public function addElementNamespaces(array $namespaces)
     {
         array_map(array($this, 'addElementNamespace'), $namespaces);
         return $this;
+    }
+
+    public function configureNamespaces(array $namespaces)
+    {
+        if (isset($namespaces['write'])) {
+            $this->addWriteStrategyNamespaces($namespaces['write']);
+        }
+
+        if (isset($namespaces['resize'])) {
+            $this->addResizeStrategyNamespaces($namespaces['resize']);
+        }
+
+        if (isset($namespaces['filter'])) {
+            $this->addFilterStrategyNamespaces($namespaces['write']);
+        }
+
+        if (isset($namespaces['element'])) {
+            $this->addElementNamespaces($namespaces['element']);
+        }
     }
     
     /**
@@ -95,7 +105,7 @@ class ImageFactory
      */
     public function createImage($width, $height)
     {
-        $image = new \Sokil\Image;
+        $image = new Image();
         return $image->create($width, $height);
     }
     
@@ -112,7 +122,7 @@ class ImageFactory
     private function getResizeStrategyClassNameByResizeMode($resizeMode)
     {
         // save strategy
-        foreach ($this->_resizeStrategyNamespaces as $namespace) {
+        foreach ($this->resizeStrategyNamespaces as $namespace) {
             $resizeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($resizeMode)) . 'ResizeStrategy';
             if (class_exists($resizeStrategyClassName)) {
                 return $resizeStrategyClassName;
@@ -128,7 +138,7 @@ class ImageFactory
 
         /* @var $resizeStrategy \Sokil\Image\AbstractResizeStrategy */
         $resizeStrategy = new $resizeStrategyClassName();
-        if (!($resizeStrategy instanceof \Sokil\Image\AbstractResizeStrategy)) {
+        if (!($resizeStrategy instanceof AbstractResizeStrategy)) {
             throw new \Exception('Resize strategy must extend AbstractResizeStrategy');
         }
 
@@ -137,10 +147,10 @@ class ImageFactory
         return $this;
     }
     
-    private function getFilterStrategyClassnameByFilterName($name)
+    private function getFilterStrategyClassNameByFilterName($name)
     {
         // save strategy
-        foreach ($this->_filterStrategyNamespaces as $namespace) {
+        foreach ($this->filterStrategyNamespaces as $namespace) {
             $filterStrategyClassName = $namespace . '\\' . ucfirst(strtolower($name)) . 'FilterStrategy';
             if (class_exists($filterStrategyClassName)) {
                 return $filterStrategyClassName;
@@ -152,10 +162,10 @@ class ImageFactory
     
     public function filterImage(Image $image, $name, $configuratorCallable = null)
     {
-        $filterStrategyClassName = $this->getFilterStrategyClassnameByFilterName($name);
+        $filterStrategyClassName = $this->getFilterStrategyClassNameByFilterName($name);
 
         $filterStrategy = new $filterStrategyClassName;
-        if (!($filterStrategy instanceof \Sokil\Image\AbstractFilterStrategy)) {
+        if (!($filterStrategy instanceof AbstractFilterStrategy)) {
             throw new \Exception('Filter strategy must extend AbstractFilterStrategy');
         }
 
@@ -172,7 +182,7 @@ class ImageFactory
     private function getWriteStrategyClassNameByWriteFormat($format)
     {
         // save strategy
-        foreach ($this->_writeStrategyNamespaces as $namespace) {
+        foreach ($this->writeStrategyNamespaces as $namespace) {
             $writeStrategyClassName = $namespace . '\\' . ucfirst(strtolower($format)) . 'WriteStrategy';
             if (class_exists($writeStrategyClassName)) {
                 return $writeStrategyClassName;
@@ -182,22 +192,32 @@ class ImageFactory
         throw new \Exception('Format ' . $format . ' not supported');
     }
     /**
+     * Write image to file
+     *
+     * @param Image $image
      * @param string $format
-     * @return \Sokil\Image\AbstractWriteStrategy
+     * @param callable $configuratorCallable
+     *
+     * @return ImageFactory
+     *
+     * @throws ImageException
      */
-    public function writeImage(Image $image, $format, $configuratorCallable = null)
-    {
+    public function writeImage(
+        Image $image,
+        $format,
+        $configuratorCallable = null
+    ) {
         $writeStrategyClassName = $this->getWriteStrategyClassNameByWriteFormat($format);
 
         $writeStrategy = new $writeStrategyClassName;
-        if (!($writeStrategy instanceof \Sokil\Image\AbstractWriteStrategy)) {
-            throw new \Exception('Write strategy must extend AbstractWriteStrategy');
+        if (!($writeStrategy instanceof AbstractWriteStrategy)) {
+            throw new ImageException('Write strategy must extend AbstractWriteStrategy');
         }
         
         // configure 
         if($configuratorCallable) {
             if(!is_callable($configuratorCallable)) {
-                throw new \Exception('Wrong configurator specified');
+                throw new ImageException('Wrong configurator specified');
             }
 
             call_user_func($configuratorCallable, $writeStrategy);
@@ -210,7 +230,7 @@ class ImageFactory
     
     private function getElementClassNameByElementName($name)
     {
-        foreach($this->_elementNamespaces as $namespace) {
+        foreach($this->elementNamespaces as $namespace) {
             $elementClassName = $namespace . '\\' . ucfirst(strtolower($name));
             if(class_exists($elementClassName)) {
                 return $elementClassName;
@@ -224,9 +244,10 @@ class ImageFactory
      * Create element
      * 
      * @param string $name name of element
-     * @return \Sokil\Image\AbstractElement
+     * @return AbstractElement
      * @throws \InvalidArgumentException
-     * @throws \Exception
+     *
+     * @throws ImageException
      */
     public function createElement($name)
     {
@@ -234,8 +255,8 @@ class ImageFactory
         
         $element = new $elementClassName;
 
-        if(!($element instanceof \Sokil\Image\AbstractElement)) {
-            throw new \Exception('Element must implement AbstractElement class');
+        if(!($element instanceof AbstractElement)) {
+            throw new ImageException('Element must implement AbstractElement class');
         }
 
         return $element;
