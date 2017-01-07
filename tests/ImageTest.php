@@ -105,19 +105,19 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testResize()
     {
         $image = $this->factory->openImage(__DIR__ . '/test.png');
-        $this->factory->resizeImage($image, 'scale', 100, 200);
+        $resizedImage = $this->factory->resizeImage($image, 'scale', 100, 200);
         
-        $this->assertEquals(100, $image->getWidth());
-        $this->assertEquals(66, $image->getHeight());
+        $this->assertEquals(100, $resizedImage->getWidth());
+        $this->assertEquals(66, $resizedImage->getHeight());
     }
     
     public function testRotate()
     {
         $image = $this->factory->openImage(__DIR__ . '/test.png');
-        $resizedImage = $image->rotate(90, '#FF0000');
+        $rotatedImage = $image->rotate(90, '#FF0000');
         
-        $this->assertEquals(200, $resizedImage->getWidth());
-        $this->assertEquals(300, $resizedImage->getHeight());
+        $this->assertEquals(200, $rotatedImage->getWidth());
+        $this->assertEquals(300, $rotatedImage->getHeight());
     }
 
     public function flipDataProvider()
@@ -148,12 +148,12 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $reflection = new \ReflectionClass($image);
         $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
-        $method->invoke($image);
+        $flippedImage = $method->invoke($image);
 
         // get flipped color
         $actualColor = imagecolorsforindex(
-            $image->getResource(),
-            imagecolorat($image->getResource(), $flippedPoint[0], $flippedPoint[1])
+            $flippedImage->getResource(),
+            imagecolorat($flippedImage->getResource(), $flippedPoint[0], $flippedPoint[1])
         );
 
         // check
@@ -163,12 +163,12 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testGreyscale()
     {
         $image = $this->factory->openImage(__DIR__ . '/test.png');
-        $this->factory->filterImage($image, 'greyscale');
+        $filteredImage = $this->factory->filterImage($image, 'greyscale');
         
-        $color = imagecolorat($image->getResource(), 0, 0);
+        $color = imagecolorat($filteredImage->getResource(), 0, 0);
         $this->assertEquals(array(29, 29, 29), Rgb::fromIntAsArray($color));
         
-        $color = imagecolorat($image->getResource(), 0, 199);
+        $color = imagecolorat($filteredImage->getResource(), 0, 199);
         $this->assertEquals(array(225, 225, 225), Rgb::fromIntAsArray($color));
     }
     
@@ -200,13 +200,13 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testCrop()
     {
         $image = $this->factory->openImage(__DIR__ . '/test.png');
-        $image->crop(10, 10, 10, 10);
+        $croppedImage = $image->crop(10, 10, 10, 10);
         
-        $this->assertEquals(10, imagesx($image->getResource()));
-        $this->assertEquals(10, imagesy($image->getResource()));
+        $this->assertEquals(10, imagesx($croppedImage->getResource()));
+        $this->assertEquals(10, imagesy($croppedImage->getResource()));
         $this->assertEquals(
             array(0, 0, 255, 0),
-            Rgb::fromInt(imagecolorat($image->getResource(), 5, 5))->toArray()
+            Rgb::fromInt(imagecolorat($croppedImage->getResource(), 5, 5))->toArray()
         );
     }
 }

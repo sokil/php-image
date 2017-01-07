@@ -31,13 +31,18 @@ class Image
         // load image
         if ($image) {
             if (is_string($image)) {
-                $this->loadFile($image);
+                $this->loadFromFile($image);
             } elseif (is_resource($image)) {
-                $this->loadResource($image);
+                $this->loadFromResource($image);
             } else {
                 throw new ImageException('Must be image resource or filename, ' . gettype($image) . ' given');
             }
         }
+    }
+
+    public function __clone()
+    {
+        $this->resource = $this->getResourceCopy();
     }
 
     /**
@@ -49,7 +54,7 @@ class Image
      */
     public function create($width, $height)
     {
-        return $this->loadResource(imagecreatetruecolor($width, $height));
+        return $this->loadFromResource(imagecreatetruecolor($width, $height));
     }
 
     /**
@@ -59,7 +64,7 @@ class Image
      * @return $this
      * @throws \Exception
      */
-    public function loadFile($filename)
+    public function loadFromFile($filename)
     {
         if (!file_exists($filename)) {
             throw new ImageException('File ' . $filename . ' not found');
@@ -111,7 +116,7 @@ class Image
      *
      * @throws \Exception
      */
-    public function loadResource($resource)
+    public function loadFromResource($resource)
     {
         if (!(is_resource($resource) && 'gd' === get_resource_type($resource))) {
             throw new \Exception('Must be resource of type "gd", ' . gettype($resource) . ' given');
@@ -132,6 +137,26 @@ class Image
     public function getResource()
     {
         return $this->resource;
+    }
+
+    public function getResourceCopy()
+    {
+        $originalResource = $this->resource;
+
+        $clonedResource = imagecreatetruecolor($this->width, $this->height);
+
+        imagecopy(
+            $clonedResource,
+            $originalResource,
+            0,
+            0,
+            0,
+            0,
+            $this->width,
+            $this->height
+        );
+
+        return $clonedResource;
     }
 
     /**
@@ -189,20 +214,18 @@ class Image
      * @param int $width
      * @param int $height
      *
-     * @return $this
+     * @return Image
      */
     public function resize(
         AbstractResizeStrategy $resizeStrategy,
         $width,
         $height
     ) {
-        return $this->loadResource(
-            $resizeStrategy->resize(
-                $this->resource,
-                $width,
-                $height
-            )
-        );
+        return new Image($resizeStrategy->resize(
+            $this->resource,
+            $width,
+            $height
+        ));
     }
 
     /**
@@ -224,7 +247,7 @@ class Image
      * @param float $angle
      * @param int|string|array|Rgb $backgroundColor
      *
-     * @return $this
+     * @return Image
      */
     public function rotate(
         $angle,
@@ -235,7 +258,7 @@ class Image
             : new Rgb(0, 0, 0, 127);
 
         // create color
-        $backgroundColorId = \imageColorAllocateAlpha(
+        $backgroundColorId = imageColorAllocateAlpha(
             $this->resource,
             $backgroundColor->getRed(), 
             $backgroundColor->getGreen(), 
@@ -249,7 +272,7 @@ class Image
         imagealphablending($rotatedImageResource, false);
         imagesavealpha($rotatedImageResource, true);
 
-        return $this->loadResource($rotatedImageResource);
+        return new Image($rotatedImageResource);
     }
 
     /**
@@ -261,69 +284,72 @@ class Image
     {
         // use native function
         if (function_exists('imageflip')) {
-            imageflip($this->resource, IMG_FLIP_VERTICAL);
+            $flippedImageResource = $this->getResourceCopy();
+            imageflip($flippedImageResource, IMG_FLIP_VERTICAL);
         } else {
-            $resource = imagecreatetruecolor($this->width, $this->height);
+            $flippedImageResource = imagecreatetruecolor($this->width, $this->height);
             for ($x = 0; $x < $this->width; $x++) {
                 for($y = 0; $y < $this->height; $y++) {
                     $color = imagecolorat($this->resource, $x, $y);
                     imagesetpixel(
-                        $resource,
+                        $flippedImageResource,
                         $x,
                         $this->height - 1 - $y,
                         $color
                     );
                 }
             }
-            $this->resource = $resource;
         }
-        return $this;
+
+        return new Image($flippedImageResource);
     }
 
     public function flipHorizontal()
     {
         // use native function
         if (function_exists('imageflip')) {
-            imageflip($this->resource, IMG_FLIP_HORIZONTAL);
+            $flippedImageResource = $this->getResourceCopy();
+            imageflip($flippedImageResource, IMG_FLIP_HORIZONTAL);
         } else {
-            $resource = imagecreatetruecolor($this->width, $this->height);
+            $flippedImageResource = imagecreatetruecolor($this->width, $this->height);
             for ($x = 0; $x < $this->width; $x++) {
                 for ($y = 0; $y < $this->height; $y++) {
                     $color = imagecolorat($this->resource, $x, $y);
                     imagesetpixel(
-                        $resource,
+                        $flippedImageResource,
                         $this->width - 1 - $x,
                         $y,
                         $color
                     );
                 }
             }
-            $this->resource = $resource;
         }
-        return $this;
+
+        return new Image($flippedImageResource);
     }
 
     public function flipBoth()
     {
         // use native function
         if (function_exists('imageflip')) {
-            $resource = imageflip($this->resource, IMG_FLIP_BOTH);
+            $flippedImageResource = $this->getResourceCopy();
+            imageflip($flippedImageResource, IMG_FLIP_BOTH);
         } else {
-            $resource = imagecreatetruecolor($this->width, $this->height);
+            $flippedImageResource = imagecreatetruecolor($this->width, $this->height);
             for ($x = 0; $x < $this->width; $x++) {
                 for($y = 0; $y < $this->height; $y++) {
                     $color = imagecolorat($this->resource, $x, $y);
                     imagesetpixel(
-                        $resource,
+                        $flippedImageResource,
                         $this->width - 1 - $x,
                         $this->height - 1 - $y,
                         $color
                     );
                 }
             }
-            $this->resource = $resource;
         }
-        return $this;
+
+        return new Image($flippedImageResource);
     }
 
     /**
@@ -335,9 +361,7 @@ class Image
      */
     public function filter(AbstractFilterStrategy $filterStrategy)
     {
-        $this->loadResource($filterStrategy->filter($this->resource));
-        
-        return $this;
+        return new Image($filterStrategy->filter($this->resource));
     }
 
     /**
@@ -366,7 +390,7 @@ class Image
             $height
         );
         
-        $this->loadResource($croppedImageResource);
+        return new Image($croppedImageResource);
     }
 
     /**

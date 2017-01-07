@@ -35,8 +35,10 @@ class Factory
     
     /**
      * Create empty image
+     *
      * @param int $width
      * @param int $height
+     *
      * @return Image
      */
     public function createImage($width, $height)
@@ -56,7 +58,18 @@ class Factory
     {
         return new Image($image);
     }
-    
+
+    /**
+     * Resize image
+     *
+     * @param Image $image
+     * @param string $mode
+     * @param int $width
+     * @param int $height
+     * @return Image
+     *
+     * @throws ImageException
+     */
     public function resizeImage(
         Image $image,
         $mode,
@@ -71,11 +84,20 @@ class Factory
             throw new ImageException('Resize strategy must extend AbstractResizeStrategy');
         }
 
-        $image->resize($resizeStrategy, $width, $height);
-        
-        return $this;
+        return $image->resize($resizeStrategy, $width, $height);
     }
-    
+
+    /**
+     * Apply filter to image
+     *
+     * @param Image $image
+     * @param string $name
+     * @param callable $configuratorCallable
+     *
+     * @return Image
+     *
+     * @throws ImageException
+     */
     public function filterImage(
         Image $image,
         $name,
@@ -93,9 +115,7 @@ class Factory
             call_user_func($configuratorCallable, $filterStrategy);
         }
         
-        $image->filter($filterStrategy);
-        
-        return $this;
+        return $image->filter($filterStrategy);
     }
 
     /**
@@ -105,7 +125,7 @@ class Factory
      * @param string $format
      * @param callable $configuratorCallable
      *
-     * @return $this
+     * @return Image
      *
      * @throws ImageException
      */
@@ -130,18 +150,17 @@ class Factory
             call_user_func($configuratorCallable, $writeStrategy);
         }
         
-        $image->write($writeStrategy);
-        
-        return $this;
+        return $image->write($writeStrategy);
     }
     
     /**
      * Create element
      * 
      * @param string $name name of element
-     * @return AbstractElement
-     * @throws \InvalidArgumentException
      *
+     * @return AbstractElement
+     *
+     * @throws \InvalidArgumentException
      * @throws ImageException
      */
     public function createElement($name)
