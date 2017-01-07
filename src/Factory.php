@@ -63,7 +63,7 @@ class Factory
      * Resize image
      *
      * @param Image $image
-     * @param string $mode
+     * @param string $mode may be 'scale', 'fit', 'crop' and 'cache' or any user-defined mode
      * @param int $width
      * @param int $height
      * @return Image
