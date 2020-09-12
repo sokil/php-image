@@ -2,13 +2,15 @@
 
 namespace Sokil;
 
+use PHPUnit\Framework\TestCase;
 use \Sokil\Image\ColorModel\Rgb;
+use Sokil\Image\Exception\ImageException;
 use Sokil\Image\Factory;
 use Sokil\Image\WriteStrategy\GifWriteStrategy;
 use Sokil\Image\WriteStrategy\JpegWriteStrategy;
 use Sokil\Image\WriteStrategy\PngWriteStrategy;
 
-class ImageTest extends \PHPUnit_Framework_TestCase
+class ImageTest extends TestCase
 {
     /**
      *
@@ -16,17 +18,16 @@ class ImageTest extends \PHPUnit_Framework_TestCase
      */
     protected $factory;
     
-    public function setUp()
+    public function setUp(): void
     {
         $this->factory = new Factory();
     }
-    
-    /**
-     * @expectedException \Sokil\Image\Exception\ImageException
-     * @expectedExceptionMessage File /some-unexisted-file.jpg not found
-     */
+
     public function testLoadFile_UnexistedFile()
     {
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('File /some-unexisted-file.jpg not found');
+
         $this->factory->openImage('/some-unexisted-file.jpg');
     }
     

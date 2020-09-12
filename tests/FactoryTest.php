@@ -2,7 +2,9 @@
 
 namespace Sokil\Image;
 
-class FactoryTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class FactoryTest extends TestCase
 {
     /**
      *
@@ -10,7 +12,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected $factory;
     
-    public function setUp()
+    public function setUp(): void
     {
         $this->factory = new Factory();
     }

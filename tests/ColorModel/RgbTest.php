@@ -2,7 +2,9 @@
 
 namespace Sokil\Image\ColorModel;
 
-class RgbTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class RgbTest extends TestCase
 {
     public function testFromHex()
     {       

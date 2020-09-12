@@ -9,16 +9,26 @@
     ],
     "license": "MIT",
     "require": {
-        "php": ">=5.3",
+        "php": ">=7.2",
         "ext-gd": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=3.7 <6.0",
-        "satooshi/php-coveralls": "0.7.*"
+        "phpunit/phpunit": "^9.3",
+        "php-coveralls/php-coveralls": "^2.2.0"
     },
     "autoload": {
         "psr-4": {
             "Sokil\\Image\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sokil\\Image\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit",
+        "cover": "./vendor/bin/phpunit --coverage-clover ./build/phpunit/clover.xml",
+        "coveralls": "./vendor/bin/php-coveralls -v"
     }
 }
