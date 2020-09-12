@@ -53,6 +53,38 @@ class ImageTest extends \PHPUnit_Framework_TestCase
             getimagesize($targetFilename)
         );
     }
+
+    public function testWrite_Jpeg_Stdout()
+    {
+        $sourceFilename = __DIR__ . '/test.jpg';
+        $targetFilename = sys_get_temp_dir() . '/sokil-php-image.jpg';
+
+        $image = $this->factory->openImage($sourceFilename);
+
+        ob_start();
+
+        $this->factory->writeImage(
+            $image,
+            'jpeg',
+            function(JpegWriteStrategy $writeStrategy) use($targetFilename) {
+                $writeStrategy->setQuality(100)->toStdout();
+            }
+        );
+
+        $content = ob_get_clean();
+
+        // check file existance
+        $this->assertNotEmpty($content);
+
+
+        // check image
+        file_put_contents($targetFilename, $content);
+
+        $this->assertEquals(
+            getimagesize($sourceFilename),
+            getimagesize($targetFilename)
+        );
+    }
     
     public function testWrite_Gif()
     {

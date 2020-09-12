@@ -20,17 +20,21 @@ class JpegWriteStrategy extends AbstractWriteStrategy
     
     public function write($resource)
     {
-        if(!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
+        if (!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
             throw new \Exception('Resource must be given');
         }
-        
-        $targetPath = $this->targetPath;
-        
-        if(!in_array(strtolower(pathinfo($targetPath, PATHINFO_EXTENSION)), array('jpg', 'jpeg'))) {
-            $targetPath .= '.jpg';
+
+        if (!empty($this->targetPath)) {
+            $targetPath = $this->targetPath;
+            if (!in_array(strtolower(pathinfo($targetPath, PATHINFO_EXTENSION)), array('jpg', 'jpeg'))) {
+                $targetPath .= '.jpg';
+            }
+        } else {
+            $targetPath = null;
         }
-        
-        if(!imagejpeg($resource, $targetPath, $this->quality)) {
+
+
+        if (!imagejpeg($resource, $targetPath, $this->quality)) {
             throw new \Exception('Error writing JPEG file');
         }
     }

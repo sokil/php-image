@@ -67,14 +67,17 @@ class PngWriteStrategy extends AbstractWriteStrategy
         if(!is_resource($resource)  || 'gd' !== get_resource_type($resource)) {
             throw new \Exception('Resource must be given');
         }
-        
-        $targetPath = $this->targetPath;
-        
-        if('png' !== strtolower(pathinfo($targetPath, PATHINFO_EXTENSION))) {
-            $targetPath .= '.png';
+
+        if (!empty($this->targetPath)) {
+            $targetPath = $this->targetPath;
+            if('png' !== strtolower(pathinfo($targetPath, PATHINFO_EXTENSION))) {
+                $targetPath .= '.png';
+            }
+        } else {
+            $targetPath = null;
         }
-        
-        if(!imagepng($resource, $targetPath, $this->quality, $this->filter)) {
+
+        if (!imagepng($resource, $targetPath, $this->quality, $this->filter)) {
             throw new \Exception('Error writing PNG file');
         }
     }

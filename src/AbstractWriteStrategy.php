@@ -20,6 +20,11 @@ abstract class AbstractWriteStrategy
         
         return $this;
     }
+
+    public function toStdout()
+    {
+        $this->targetPath = null;
+    }
     
     abstract public function write($resource);
 }
